@@ -1,5 +1,7 @@
 include { config_import_MeSH ; build_importMesh } from './forum-MeSH'
 include { config_import_MetaNetX ; build_import_MetaNetX } from './forum-MetaNetX'
+include { config_import_PubChemMin ; build_import_PubChemMin } from './forum-PubChem-min'
+include { getDate ; config_import_PMIDCID ; build_import_PMIDCID } from './forum-PMID-CID'
 
 params.repogit = 'https://github.com/eMetaboHUB/Forum-DiseasesChem.git'
 params.rdfoutdir= 'virtuoso'
@@ -107,6 +109,13 @@ workflow {
 
     build_importMesh(rdfoutdir,logdir,config_import_MeSH(),appDir).view()
     build_import_MetaNetX(rdfoutdir,logdir,config_import_MetaNetX(),appDir).view()
+    pubchemVersion = build_import_PubChemMin(rdfoutdir,logdir,config_import_PubChemMin(),appDir)
+                        .map(file -> file.baseName)
 
+
+    versionFORUM = getDate()
+    print(" **************** Build $versionFORUM ********************")
+
+    build_import_PMIDCID( rdfoutdir,logdir, config_import_PMIDCID(versionFORUM,pubchemVersion), appDir)
 
 }
