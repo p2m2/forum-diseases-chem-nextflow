@@ -154,7 +154,7 @@ process build_import_MetaNetX {
         path import_MetaNetX
         path app
     output:
-        path "$rdfoutdir/Me/*"
+        path "$rdfoutdir/MetaNetX"
 
     """
     export TESTDEV=${params.testDev}
