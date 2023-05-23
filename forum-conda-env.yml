@@ -1,0 +1,16 @@
+name: forum
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+  - r
+dependencies:
+  - python=3.8
+  - r-base
+  - r-essentials
+  - rdflib
+  - python-dateutil
+  - entrez-direct
+  - numpy
+  - pandas
+  - bs4
