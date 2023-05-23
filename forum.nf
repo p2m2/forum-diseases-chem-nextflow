@@ -1,7 +1,9 @@
+include { config_import_MeSH ; build_importMesh } from './forum-MeSH'
+
 params.repogit = 'https://github.com/eMetaboHUB/Forum-DiseasesChem.git'
 params.rdfoutdir= 'virtuoso'
 params.logdir= 'log'
-params.testDev = 'true'
+
 
 params.vocabularydir='virtuoso/vocabulary'
 
@@ -89,24 +91,7 @@ process download_fabio_vocabulary {
 /* Config builder */
 /* --------------------------*/
 
-process config_import_MeSH {
 
-    output:
-        path 'import_MeSH.ini'
-
-    """
-    tee -a import_MeSH.ini << END
-    [DEFAULT]
-    upload_file = upload_MeSH.sh
-    log_file = dl_MeSH.log
-    [MESH]
-    version = latest
-    ftp = ftp.nlm.nih.gov
-    ftp_path_void = /online/mesh/rdf/void_1.0.0.ttl
-    ftp_path_mesh = /online/mesh/rdf/mesh.nt
-    END
-    """
-}
 
 
 process config_import_MetaNetX {
@@ -130,21 +115,6 @@ process config_import_MetaNetX {
 /* Builder                   */
 /* --------------------------*/
 
-process build_importMesh {
-    conda 'forum-conda-env.yml'
-    input:
-        path rdfoutdir
-        path logdir
-        path import_MeSH
-        path app
-    output:
-        path "$rdfoutdir/MeSH"
-
-    """
-    export TESTDEV=${params.testDev}
-    python3 -u $app/build/import_MeSH.py --config="$import_MeSH" --out="$rdfoutdir" --log="$logdir"
-    """
-}
 
 process build_import_MetaNetX {
     conda 'forum-conda-env.yml'
@@ -180,7 +150,7 @@ workflow {
     */
 
 
-    build_importMesh(rdfoutdir,logdir,config_import_MeSH(),appDir)
+    build_importMesh(rdfoutdir,logdir,config_import_MeSH(),appDir).view()
     build_import_MetaNetX(rdfoutdir,logdir,config_import_MetaNetX(),appDir)
 
 
