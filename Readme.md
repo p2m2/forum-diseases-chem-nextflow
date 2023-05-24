@@ -35,3 +35,11 @@ curl -s https://get.nextflow.io | bash
 ```bash
 ./nextflow forum.nf -resume
 ```
+
+## Dev
+
+### test subworkflow (example with FORUM vocabularies)
+
+```bash
+./nextflow run forum-vocabularies.nf -entry forum_vocabularies -resume
+```

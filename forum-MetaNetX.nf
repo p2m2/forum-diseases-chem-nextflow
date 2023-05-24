@@ -1,6 +1,8 @@
+include { app_forumScripts } from './forum-source-repository'
 
 
 process config_import_MetaNetX {
+    publishDir params.configdir
 
     output:
         path 'import_MetaNetX.ini'
@@ -19,16 +21,25 @@ process config_import_MetaNetX {
 
 process build_import_MetaNetX {
     conda 'forum-conda-env.yml'
+    
+    publishDir params.rdfoutdir, pattern: "MetaNetX"
+    publishDir params.rdfoutdir, pattern: "upload_MetaNetX.sh"
+    publishDir params.logdir, pattern: "*.log"
+
     input:
-        path rdfoutdir
-        path logdir
-        path import_MetaNetX
-        path app
+        tuple path(import_MetaNetX), path(app)
+
     output:
-        path "$rdfoutdir/MetaNetX"
+        path "MetaNetX"
+        path "upload_MetaNetX.sh"
+        path "*.log"
 
     """
     export TESTDEV=${params.testDev}
-    python3 -u $app/build/import_MetaNetX.py --config="$import_MetaNetX" --out="$rdfoutdir" --log="$logdir"
+    python3 -u $app/build/import_MetaNetX.py --config="$import_MetaNetX" --out="." --log="."
     """
+}
+
+workflow forum_MetaNetX() {
+    config_import_MetaNetX().combine(app_forumScripts()) | build_import_MetaNetX 
 }

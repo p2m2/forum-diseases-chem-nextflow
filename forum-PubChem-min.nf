@@ -1,5 +1,7 @@
+include { app_forumScripts } from './forum-source-repository'
 
 process config_import_PubChemMin {
+    publishDir params.configdir
     output:
         path 'import_PubChem_min.ini'
 
@@ -21,17 +23,39 @@ process config_import_PubChemMin {
 }
 
 process build_import_PubChemMin {
+    debug false
     conda 'forum-conda-env.yml'
+    publishDir params.rdfoutdir, pattern: "PubChem_Compound"
+    publishDir params.rdfoutdir, pattern: "PubChem_Descriptor"
+    publishDir params.rdfoutdir, pattern: "PubChem_InchiKey"
+    publishDir params.rdfoutdir, pattern: "PubChem_Reference"
+    publishDir params.rdfoutdir, pattern: "PubChem_Synonym"
+    publishDir params.rdfoutdir, pattern: "upload_PubChem_minimal.sh"
+    publishDir params.logdir, pattern: "*.log"
+    
     input:
-        path rdfoutdir
-        path logdir
-        path import_PubChem_min
-        path app
+        tuple path(import_PubChem_min), path(app)
     output:
-        path "$rdfoutdir/PubChem_Compound/compound/*" //get date-version of pubchem
+        path "PubChem_*"
+        path "upload_PubChem_minimal.sh"
+        path "*.log"
+        //path "$rdfoutdir/PubChem_Compound/compound/*" //get date-version of pubchem
 
     """
     export TESTDEV=${params.testDev}
-    python3 -u $app/build/import_PubChem.py --config="$import_PubChem_min" --out="$rdfoutdir" --log="$logdir"
+    python3 -u $app/build/import_PubChem.py --config="$import_PubChem_min" --out="." --log="."
     """
+}
+
+process pubchemVersion {
+    input:
+        path pubChemCompoundDir
+    output: stdout
+    """
+    ls ${pubChemCompoundDir}/compound/
+    """
+}
+
+workflow forum_PubChemMin() {
+    config_import_PubChemMin().combine(app_forumScripts()) | build_import_PubChemMin 
 }

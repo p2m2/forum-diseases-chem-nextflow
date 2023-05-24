@@ -1,18 +1,10 @@
-
-process getDate {
-    
-    output:
-        stdout 
-    
-    """
-    date +"%Y%m%d"
-    """
-}
-
+include { app_forumScripts } from './forum-source-repository'
+include { pubchemVersion ; forum_PubChemMin } from './forum-PubChem-min'
 
 process config_import_PMIDCID {
+    publishDir params.configdir
+
     input:
-        val version
         val pubchemVersion
 
     output:
@@ -24,7 +16,7 @@ process config_import_PMIDCID {
     upload_file = upload_PMID_CID.sh
     log_file = log_PMID_CID.log
     [ELINK]
-    version = ${version}
+    version = ${params.forumRelease}
     run_as_test = ${params.entrez.run_as_test}
     pack_size = ${params.entrez.pack_size}
     api_key = ${params.entrez.apikey}
@@ -38,17 +30,31 @@ process config_import_PMIDCID {
 }
 
 process build_import_PMIDCID {
+    debug true
     conda 'forum-conda-env.yml'
+    
+    publishDir params.rdfoutdir, pattern: "PMID_CID"
+    publishDir params.rdfoutdir, pattern: "PMID_CID_endpoints"
+    publishDir params.rdfoutdir, pattern: "uploadXXXXX.sh"
+    publishDir params.logdir, pattern: "*.log"
+
     input:
-        path rdfoutdir
-        path logdir
-        path import_PMID_CID
-        path app
+        tuple path(import_PMID_CID), path(app)
     output:
-        path "$rdfoutdir/PMID_CID"
+        path "PMID_CID"
+        path "PMID_CID_endpoints"
+        path "uploadXXXXX.sh"
+        path "*.log"
 
     """
     export TESTDEV=${params.testDev}
-    python3 -u $app/build/import_PMID_CID.py --config="$import_PMID_CID" --out="$rdfoutdir" --log="$logdir"
+    python3 -u $app/build/import_PMID_CID.py --config="$import_PMID_CID" --out="." --log="."
     """
+}
+
+workflow forum_PMID_CID() {
+    forum_PubChemMin()
+    config_import_PMIDCID(
+        pubchemVersion(Channel.fromPath("${params.rdfoutdir}/PubChem_Compound"))
+        ).combine(app_forumScripts()) | build_import_PMIDCID 
 }
