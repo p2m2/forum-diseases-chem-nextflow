@@ -1,15 +1,13 @@
 # forum-diseases-chem-nextflow
 
-```bash
-./nextflow forum.nf -resume
-```
+The workflow was built from the [manual](https://gist.github.com/ofilangi/9c026c7f1b9ff3b38de3ee6153f15326) construction notes of [FORUM](https://github.com/eMetaboHUB/Forum-DiseasesChem/)
 
 ## Configuration
 
 ``nextflow.config
 
 - `TESTDEV` to false for a release production
-- 
+- entrez
 
 ## Notes Genouest
 
@@ -30,4 +28,10 @@ srun --cpus-per-task=8 --mem=50G --pty bash
 conda activate ~/env-forum
 alias ll='ls -ail'
 curl -s https://get.nextflow.io | bash
+```
+
+## Build FORUM
+
+```bash
+./nextflow forum.nf -resume
 ```
