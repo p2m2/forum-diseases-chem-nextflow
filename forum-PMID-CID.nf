@@ -39,7 +39,7 @@ process build_import_PMIDCID {
     publishDir params.logdir, pattern: "*.log"
 
     input:
-        tuple path(import_PMID_CID), path(app)
+        tuple path(import_PMID_CID), path(app), path(pubChemCompound), path(pubChemReference)
     output:
         path "PMID_CID"
         path "PMID_CID_endpoints"
@@ -48,6 +48,7 @@ process build_import_PMIDCID {
 
     """
     export TESTDEV=${params.testDev}
+    pip install eutils --quiet
     python3 -u $app/build/import_PMID_CID.py --config="$import_PMID_CID" --out="." --log="."
     """
 }
@@ -56,5 +57,8 @@ workflow forum_PMID_CID() {
     forum_PubChemMin()
     config_import_PMIDCID(
         pubchemVersion(Channel.fromPath("${params.rdfoutdir}/PubChem_Compound"))
-        ).combine(app_forumScripts()) | build_import_PMIDCID 
+        ).combine(app_forumScripts()) 
+        .combine(Channel.fromPath("${params.rdfoutdir}/PubChem_Compound")) 
+        .combine(Channel.fromPath("${params.rdfoutdir}/PubChem_Reference")) 
+        | build_import_PMIDCID 
 }
