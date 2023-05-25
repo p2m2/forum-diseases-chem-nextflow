@@ -36,13 +36,15 @@ process build_import_PubChemMin {
     input:
         tuple path(import_PubChem_min), path(app)
     output:
-        path "PubChem_*"
+        path "PubChem_Compound"
+        path "PubChem_Descriptor"
+        path "PubChem_InchiKey"
+        path "PubChem_Reference"
+        path "PubChem_Synonym"
         path "upload_PubChem_minimal.sh"
         path "*.log"
-        //path "$rdfoutdir/PubChem_Compound/compound/*" //get date-version of pubchem
-
+       
     """
-    export TESTDEV=${params.testDev}
     python3 -u $app/build/import_PubChem.py --config="$import_PubChem_min" --out="." --log="."
     """
 }

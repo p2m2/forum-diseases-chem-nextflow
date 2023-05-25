@@ -35,7 +35,6 @@ process build_importMesh {
         path "*.log"
 
     """
-    export TESTDEV=${params.testDev}
     python3 -u $app/build/import_MeSH.py --config="$import_MeSH" --out="." --log="."
     """
 }

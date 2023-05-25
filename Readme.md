@@ -33,7 +33,14 @@ curl -s https://get.nextflow.io | bash
 ## Build FORUM
 
 ```bash
+export TESTDEV="true"
 ./nextflow forum.nf -resume
+```
+
+### Genouest
+
+```bash
+./nextflow forum.nf -resume -profile genouest
 ```
 
 ## Dev

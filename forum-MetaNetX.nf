@@ -35,7 +35,6 @@ process build_import_MetaNetX {
         path "*.log"
 
     """
-    export TESTDEV=${params.testDev}
     python3 -u $app/build/import_MetaNetX.py --config="$import_MetaNetX" --out="." --log="."
     """
 }
