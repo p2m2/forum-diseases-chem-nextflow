@@ -31,6 +31,10 @@ process config_import_Chemont {
 
 process build_import_Chemont {
     debug true
+    memory '20 GB'
+    cpus 8
+    executor 'slurm'
+    
     conda 'forum-conda-env.yml'
     
     publishDir params.rdfoutdir, pattern: "ClassyFire"
@@ -77,6 +81,8 @@ process pubchemVersion {
 
 workflow forum_Chemont() {
     
+    /* dependencies */
+
     inchikey = Channel.fromPath("${params.rdfoutdir}/PubChem_InchiKey")
     pmidCidPath = Channel.fromPath("${params.rdfoutdir}/PMID_CID/${params.forumRelease}")
     

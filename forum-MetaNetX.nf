@@ -2,6 +2,8 @@ include { app_forumScripts } from './forum-source-repository'
 
 
 process config_import_MetaNetX {
+    memory '10 GB'
+    executor 'slurm'
     publishDir params.configdir
 
     output:
