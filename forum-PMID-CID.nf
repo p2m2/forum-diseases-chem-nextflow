@@ -51,6 +51,8 @@ process build_import_PMIDCID {
     """
 }
 
+/* Use state-dependency pattern : https://github.com/nextflow-io/patterns/blob/master/docs/state-dependency.md */
+
 process waitPubChem {
     input:
         path pubChemCompoundDir
@@ -64,6 +66,7 @@ process waitPubChem {
     """
 }
 
+/* val ready : waiting for results of waitPubChem process */
 process pubchemVersion {
     input:
         val ready
