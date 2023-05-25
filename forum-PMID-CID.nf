@@ -62,7 +62,7 @@ process waitPubChem {
     
     """
     echo "==== Waiting for $pubChemCompoundDir and $pubChemReferenceDir ===="
-    while [ ! -f ${pubChemCompoundDir} ] && [ ! -f ${pubChemReferenceDir} ]; do sleep 1; done
+    while [ ! -e ${pubChemCompoundDir} ] || [ ! -e ${pubChemReferenceDir} ]; do sleep 1; done
     """
 }
 
@@ -87,10 +87,10 @@ workflow forum_PMID_CID() {
     waitPubChem(compound,reference)
 
     config_import_PMIDCID(
-        pubchemVersion(waitPubChem.out,compound)
+        pubchemVersion(waitPubChem.out,compound))
         .combine(app) 
         .combine(compound) 
-        .combine(reference))
+        .combine(reference)
         | build_import_PMIDCID
         
 }
