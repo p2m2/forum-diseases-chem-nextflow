@@ -127,7 +127,7 @@ process chemontVersion {
     output: 
         stdout
     maxRetries 3
-    
+
     script:
 
     '''
@@ -221,15 +221,15 @@ process build_upload_sh {
     ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${dublin_core_terms.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
     ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${cito.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
     ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${cheminf.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${chebi.fileName}', 'https://forum.semantic-metabolomics.org/ChEBI/${chebi_version}');
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${chemOnt_2_1.fileName}', 'https://forum.semantic-metabolomics.org/ChemOnt/${chemont_version}');
+    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${chebi.fileName}', 'https://forum.semantic-metabolomics.org/ChEBI/${chebi_version.trim()}');
+    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${chemOnt_2_1.fileName}', 'https://forum.semantic-metabolomics.org/ChemOnt/${chemont_version.trim()}');
     select * from DB.DBA.load_list;
     rdf_loader_run();
     checkpoint;
     select * from DB.DBA.LOAD_LIST where ll_error IS NOT NULL;
     RDFS_RULE_SET ('schema-inference-rules', 'https://forum.semantic-metabolomics.org/inference-rules');
-    RDFS_RULE_SET ('schema-inference-rules', 'https://forum.semantic-metabolomics.org/ChEBI/${chebi_version}');
-    RDFS_RULE_SET ('schema-inference-rules', 'https://forum.semantic-metabolomics.org/ChemOnt/${chemont_version}');
+    RDFS_RULE_SET ('schema-inference-rules', 'https://forum.semantic-metabolomics.org/ChEBI/${chebi_version.trim()}');
+    RDFS_RULE_SET ('schema-inference-rules', 'https://forum.semantic-metabolomics.org/ChemOnt/${chemont_version.trim()}');
     checkpoint;
     END
     """
