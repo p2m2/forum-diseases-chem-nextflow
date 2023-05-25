@@ -1,5 +1,4 @@
 include { app_forumScripts } from './forum-source-repository'
-include { pubchemVersion ; forum_PubChemMin } from './forum-PubChem-min'
 
 process config_import_PMIDCID {
     publishDir params.configdir
@@ -52,17 +51,43 @@ process build_import_PMIDCID {
     """
 }
 
+process waitPubChem {
+    input:
+        path pubChemCompoundDir
+        path pubChemReferenceDir
+    output: 
+        val true
+    
+    """
+    echo "==== Waiting for $pubChemCompoundDir and $pubChemReferenceDir ===="
+    while [ ! -f ${pubChemCompoundDir} ] && [ ! -f ${pubChemReferenceDir} ]; do sleep 1; done
+    """
+}
+
+process pubchemVersion {
+    input:
+        val ready
+        path pubChemCompoundDir
+    output: stdout
+    """
+    ls ${pubChemCompoundDir}/compound/
+    """
+}
+
 workflow forum_PMID_CID() {
-      
-    compound=file("${params.rdfoutdir}/PubChem_Compound")
-    reference=file("${params.rdfoutdir}/PubChem_Reference")
+    
+    app=app_forumScripts()
+
+    compound = Channel.fromPath("${params.rdfoutdir}/PubChem_Compound")
+    reference = Channel.fromPath("${params.rdfoutdir}/PubChem_Reference")
+    
+    waitPubChem(compound,reference)
 
     config_import_PMIDCID(
-        pubchemVersion(compound)
-        .combine(app_forumScripts()) 
-        .combine(Channel.of(compound)) 
-        .combine(Channel.of(reference))
-        ) 
+        pubchemVersion(waitPubChem.out,compound)
+        .combine(app) 
+        .combine(compound) 
+        .combine(reference))
         | build_import_PMIDCID
-     
+        
 }

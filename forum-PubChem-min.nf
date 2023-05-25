@@ -49,15 +49,7 @@ process build_import_PubChemMin {
     """
 }
 
-process pubchemVersion {
-    input:
-        path pubChemCompoundDir
-    output: stdout
-    """
-    ls ${pubChemCompoundDir}/compound/
-    """
-}
-
 workflow forum_PubChemMin() {
-    config_import_PubChemMin().combine(app_forumScripts()) | build_import_PubChemMin 
+    config_import_PubChemMin().combine(app_forumScripts()) 
+    | build_import_PubChemMin
 }
