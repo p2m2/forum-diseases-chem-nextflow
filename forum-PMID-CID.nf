@@ -34,15 +34,15 @@ process build_import_PMIDCID {
     
     publishDir params.rdfoutdir, pattern: "PMID_CID"
     publishDir params.rdfoutdir, pattern: "PMID_CID_endpoints"
-    publishDir params.rdfoutdir, pattern: "uploadXXXXX.sh"
+    publishDir params.rdfoutdir, pattern: "upload_PMID_CID.sh"
     publishDir params.logdir, pattern: "*.log"
 
     input:
-        tuple path(import_PMID_CID), path(app), path(pubChemCompound), path(pubChemReference)
+        tuple path(import_PMID_CID), path(app)
     output:
         path "PMID_CID"
         path "PMID_CID_endpoints"
-        path "uploadXXXXX.sh"
+        path "upload_PMID_CID.sh"
         path "*.log"
 
     """
@@ -79,6 +79,8 @@ process pubchemVersion {
 
 workflow forum_PMID_CID() {
     
+    /* dependencies */
+
     compound = Channel.fromPath("${params.rdfoutdir}/PubChem_Compound")
     reference = Channel.fromPath("${params.rdfoutdir}/PubChem_Reference")
     
@@ -87,8 +89,6 @@ workflow forum_PMID_CID() {
     config_import_PMIDCID(
         pubchemVersion(waitPubChem.out,compound))
         .combine(app_forumScripts()) 
-        .combine(compound) 
-        .combine(reference)
         | build_import_PMIDCID
         
 }
