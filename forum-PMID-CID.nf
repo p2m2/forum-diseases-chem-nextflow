@@ -36,9 +36,11 @@ process build_import_PMIDCID {
     publishDir params.rdfoutdir, pattern: "PMID_CID_endpoints"
     publishDir params.rdfoutdir, pattern: "upload_PMID_CID.sh"
     publishDir params.logdir, pattern: "*.log"
-
+    /*
+        pubChemCompound and pubChemReference must be as input to reach turtle files by the import_PMID_CID.py process
+    */
     input:
-        tuple path(import_PMID_CID), path(app)
+        tuple path(import_PMID_CID), path(app), path(pubChemCompound), path(pubChemReference)
     output:
         path "PMID_CID"
         path "PMID_CID_endpoints"
@@ -88,7 +90,9 @@ workflow forum_PMID_CID() {
 
     config_import_PMIDCID(
         pubchemVersion(waitPubChem.out,compound))
-        .combine(app_forumScripts()) 
+        .combine(app_forumScripts())
+        .combine(compound) 
+        .combine(reference) 
         | build_import_PMIDCID
         
 }
