@@ -103,7 +103,7 @@ process download_skos_vocabulary {
 }
 
 process download_ChemOnt2_1_vocabulary {
-    conda 'wget'
+    conda 'wget openjdk'
     publishDir params.vocabularydir
     maxRetries 3
 
