@@ -53,9 +53,7 @@ process build_import_PMIDCID {
 }
 
 workflow forum_PMID_CID() {
-   
-    forum_PubChemMin()
-    
+      
     compound=file("${params.rdfoutdir}/PubChem_Compound")
     reference=file("${params.rdfoutdir}/PubChem_Reference")
 
@@ -65,5 +63,6 @@ workflow forum_PMID_CID() {
         .combine(Channel.of(compound)) 
         .combine(Channel.of(reference))
         ) 
-        | build_import_PMIDCID 
+        | build_import_PMIDCID
+     
 }
