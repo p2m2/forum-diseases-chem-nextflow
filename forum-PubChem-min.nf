@@ -23,15 +23,15 @@ process config_import_PubChemMin {
 }
 
 process build_import_PubChemMin {
-    debug false
+    debug true
     conda 'forum-conda-env.yml'
-    publishDir params.rdfoutdir, pattern: "PubChem_Compound"
-    publishDir params.rdfoutdir, pattern: "PubChem_Descriptor"
-    publishDir params.rdfoutdir, pattern: "PubChem_InchiKey"
-    publishDir params.rdfoutdir, pattern: "PubChem_Reference"
-    publishDir params.rdfoutdir, pattern: "PubChem_Synonym"
-    publishDir params.rdfoutdir, pattern: "upload_PubChem_minimal.sh"
-    publishDir params.logdir, pattern: "*.log"
+    publishDir params.rdfoutdir, pattern: "PubChem_Compound" ,overwrite: true, failOnError: true
+    publishDir params.rdfoutdir, pattern: "PubChem_Descriptor" ,overwrite: true, failOnError: true
+    publishDir params.rdfoutdir, pattern: "PubChem_InchiKey" ,overwrite: true, failOnError: true
+    publishDir params.rdfoutdir, pattern: "PubChem_Reference" ,overwrite: true, failOnError: true
+    publishDir params.rdfoutdir, pattern: "PubChem_Synonym" ,overwrite: true, failOnError: true
+    publishDir params.rdfoutdir, pattern: "upload_PubChem_minimal.sh" ,overwrite: true, failOnError: true
+    publishDir params.logdir, pattern: "*.log" ,overwrite: true
     
     input:
         tuple path(import_PubChem_min), path(app)
@@ -50,6 +50,5 @@ process build_import_PubChemMin {
 }
 
 workflow forum_PubChemMin() {
-    config_import_PubChemMin().combine(app_forumScripts()) 
-    | build_import_PubChemMin
+    config_import_PubChemMin().combine(app_forumScripts()) | build_import_PubChemMin
 }

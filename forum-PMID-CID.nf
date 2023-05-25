@@ -79,8 +79,6 @@ process pubchemVersion {
 
 workflow forum_PMID_CID() {
     
-    app=app_forumScripts()
-
     compound = Channel.fromPath("${params.rdfoutdir}/PubChem_Compound")
     reference = Channel.fromPath("${params.rdfoutdir}/PubChem_Reference")
     
@@ -88,7 +86,7 @@ workflow forum_PMID_CID() {
 
     config_import_PMIDCID(
         pubchemVersion(waitPubChem.out,compound))
-        .combine(app) 
+        .combine(app_forumScripts()) 
         .combine(compound) 
         .combine(reference)
         | build_import_PMIDCID

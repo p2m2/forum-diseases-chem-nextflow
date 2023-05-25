@@ -10,5 +10,5 @@ workflow {
     forum_mesh |
     forum_MetaNetX |
     forum_PubChemMin |
-    forum_PMID_CID
+    forum_PMID_CID 
 }

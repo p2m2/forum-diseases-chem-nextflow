@@ -245,5 +245,5 @@ workflow forum_vocabularies() {
     skos = download_skos_vocabulary()
     chemont = download_ChemOnt2_1_vocabulary()
 
-    build_upload_sh(mesh,skos,fabio,dublincore,cito,cheminf,chebi,chemont,chebiVersion(),chemontVersion()).view()
+    build_upload_sh(mesh,skos,fabio,dublincore,cito,cheminf,chebi,chemont,chebiVersion(),chemontVersion())
 }
