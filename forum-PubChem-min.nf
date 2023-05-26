@@ -130,9 +130,9 @@ workflow forum_PubChemMin() {
 
     waitPubchemCoumpoundPath(compondPath)
 
-    config_import_PubChem_mapping(waitPubchemCoumpoundPath.out,pubchemVersion(waitPubchemCoumpoundPath.out,compondPath,descPath,inchiPath,referencePath,synonymPath))
+    config_import_PubChem_mapping(waitPubchemCoumpoundPath.out,pubchemVersion(waitPubchemCoumpoundPath.out,compondPath))
         .combine(app)
-        .combine(compondPath) 
+        .combine(compondPath,descPath,inchiPath,referencePath,synonymPath) 
         | build_import_PubChem_mapping
 
 
