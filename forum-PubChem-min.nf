@@ -81,7 +81,7 @@ process build_import_PubChem_mapping {
     publishDir params.logdir, pattern: "*.log" ,overwrite: true
     
     input:
-        tuple path(import_PubChem_mapping), path(app), path(pubChemCoumpoundPath)
+        tuple path(import_PubChem_mapping), path(app), path(pubChemCoumpoundPath), path(pubChemDescriptor), path(pubChemInchiKey), path(pubChemReference), path(pubChemSynonym)
     output:
         path "Id_mapping"
         path "upload_PubChem_mapping.sh"
@@ -123,10 +123,14 @@ workflow forum_PubChemMin() {
         | build_import_PubChemMin
 
     compondPath = build_import_PubChemMin.out[0]
+    descPath = build_import_PubChemMin.out[1]
+    inchiPath = build_import_PubChemMin.out[2]
+    referencePath = build_import_PubChemMin.out[3]
+    synonymPath = build_import_PubChemMin.out[4]
 
     waitPubchemCoumpoundPath(compondPath)
 
-    config_import_PubChem_mapping(waitPubchemCoumpoundPath.out,pubchemVersion(waitPubchemCoumpoundPath.out,compondPath))
+    config_import_PubChem_mapping(waitPubchemCoumpoundPath.out,pubchemVersion(waitPubchemCoumpoundPath.out,compondPath,descPath,inchiPath,referencePath,synonymPath))
         .combine(app)
         .combine(compondPath) 
         | build_import_PubChem_mapping
