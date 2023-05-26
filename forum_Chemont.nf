@@ -41,7 +41,7 @@ process build_import_Chemont {
     publishDir params.logdir, pattern: "*.log"
 
     input:
-        tuple path(import_Chemont), path(app), path(pubChemInchikeyDir)
+        tuple path(import_Chemont), path(app), path(pubChemInchikeyPath), path(pmidCidPath)
     output:
         path "ClassyFire"
         path "upload_Chemont.sh"
@@ -91,6 +91,7 @@ workflow forum_Chemont() {
         pubchemVersion(waitPubChemAndPmidCid.out,inchikey))
         .combine(app_forumScripts()) 
         .combine(inchikey) 
+        .combine(pmidCidPath) 
         | build_import_Chemont
         
 }
