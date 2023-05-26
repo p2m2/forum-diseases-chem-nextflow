@@ -83,9 +83,10 @@ workflow forum_Chemont() {
     /* dependencies */
 
     inchikey = Channel.fromPath("${params.rdfoutdir}/PubChem_InchiKey")
-    pmidCidPath = Channel.fromPath("${params.rdfoutdir}/PMID_CID/${params.forumRelease}")
-    
-    waitPubChemAndPmidCid(inchikey,pmidCidPath)
+    pmidCidReleasePath = Channel.fromPath("${params.rdfoutdir}/PMID_CID/${params.forumRelease}")
+    pmidCidPath = Channel.fromPath("${params.rdfoutdir}/PMID_CID")
+
+    waitPubChemAndPmidCid(inchikey,pmidCidReleasePath)
 
     config_import_Chemont(
         pubchemVersion(waitPubChemAndPmidCid.out,inchikey))
