@@ -49,6 +49,87 @@ process build_import_PubChemMin {
     """
 }
 
+process config_import_PubChem_mapping {
+    publishDir params.configdir
+    
+    input:
+        val ready
+        val pubChemVersion
+    output:
+        path 'import_PubChem_mapping.ini'
+
+    """
+    tee -a import_PubChem_mapping.ini << END
+    [DEFAULT]
+    upload_file = upload_PubChem_mapping.sh
+    [PUBCHEM]
+    version = ${pubChemVersion.trim()}
+    path_to_dir = PubChem_Compound/compound
+    mask = *_type*.ttl.gz
+    [META]
+    path = app/build/data/table_info_2021.csv
+    END
+    """
+}
+
+
+process build_import_PubChem_mapping {
+    debug true
+    conda 'forum-conda-env.yml'
+    publishDir params.rdfoutdir, pattern: "Id_mapping" , failOnError: true /* TODO: check if MetaNetX mapping exit always !!! */
+    publishDir params.rdfoutdir, pattern: "upload_PubChem_mapping.sh" ,overwrite: true, failOnError: true
+    publishDir params.logdir, pattern: "*.log" ,overwrite: true
+    
+    input:
+        tuple path(import_PubChem_mapping), path(app), path(pubChemCoumpoundPath)
+    output:
+        path "Id_mapping"
+        path "upload_PubChem_mapping.sh"
+        path "*.log"
+       
+    """
+    python3 -u $app/build/import_PubChem_mapping.py --config="$import_PubChem_mapping" --out="." > pubchem_mapping.log
+    """
+}
+
+
+process waitPubchemCoumpoundPath {
+    input:
+        path pubchemCoumpoundPath
+    output: 
+        val true
+    
+    """
+    echo "==== Waiting for $metaNetX ===="
+    while [ ! -e ${pubchemCoumpoundPath} ] ; do sleep 1; done
+    """
+}
+
+/* val ready : waiting for results of waitPubchemCoumpoundPath process */
+process pubchemVersion {
+    input:
+        val ready
+        path pubChemCompoundDir
+    output: stdout
+    """
+    ls ${pubChemCompoundDir}/compound/
+    """
+}
+
 workflow forum_PubChemMin() {
-    config_import_PubChemMin().combine(app_forumScripts()) | build_import_PubChemMin
+    app=app_forumScripts()
+    
+    config_import_PubChemMin().combine(app) 
+        | build_import_PubChemMin
+
+    compondPath = build_import_PubChemMin.out[0]
+
+    waitPubchemCoumpoundPath(compondPath)
+
+    config_import_PubChem_mapping(waitPubchemCoumpoundPath.out,pubchemVersion(waitPubchemCoumpoundPath.out,compondPath))
+        .combine(app)
+        .combine(compondPath) 
+        | build_import_PubChem_mapping
+
+
 }
