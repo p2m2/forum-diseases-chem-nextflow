@@ -23,7 +23,7 @@ process config_import_PubChemMin {
 }
 
 process build_import_PubChemMin {
-    debug true
+    debug false
     conda 'forum-conda-env.yml'
     publishDir params.rdfoutdir, pattern: "PubChem_Compound" ,overwrite: true, failOnError: true
     publishDir params.rdfoutdir, pattern: "PubChem_Descriptor" ,overwrite: true, failOnError: true
