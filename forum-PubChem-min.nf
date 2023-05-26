@@ -100,7 +100,7 @@ process waitPubchemCoumpoundPath {
         val true
     
     """
-    echo "==== Waiting for $metaNetX ===="
+    echo "==== Waiting for $pubchemCoumpoundPath ===="
     while [ ! -e ${pubchemCoumpoundPath} ] ; do sleep 1; done
     """
 }
