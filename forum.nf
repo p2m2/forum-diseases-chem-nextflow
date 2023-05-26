@@ -4,6 +4,7 @@ include { forum_MetaNetX } from './forum-MetaNetX'
 include { forum_PubChemMin } from './forum-PubChem-min'
 include { forum_PMID_CID } from './forum-PMID-CID'
 include { forum_Chemont } from './forum_Chemont'
+include { forum_SBML_Human } from './forum-SBML_Human'
 
 workflow {
     forum_vocabularies |
