@@ -2,7 +2,7 @@ include { app_forumScripts } from './forum-source-repository'
 
 
 process config_import_MetaNetX {
-    memory '10 GB'
+    memory '40 GB'
     publishDir params.configdir
 
     output:

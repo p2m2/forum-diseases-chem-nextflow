@@ -34,16 +34,23 @@ curl -s https://get.nextflow.io | bash
 
 ```bash
 export TESTDEV="true"
-./nextflow forum.nf -resume
+./nextflow run forum.nf -resume
 ```
 
 ### Genouest
 
+#### script.sh
+
 ```bash
+#!/bin/bash
+
+. /local/env/envnextflow-22.10.4.sh
 export NXF_EXECUTOR=slurm
 export NXF_OPTS="-Xms500M -Xmx2G" 
-./nextflow forum.nf -resume -profile genouest
+nextflow run forum.nf
 ```
+
+```sbatch script.sh```
 
 ## Dev
 

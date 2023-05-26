@@ -21,9 +21,9 @@ process config_import_PMIDCID {
     api_key = ${params.entrez.apikey}
     timeout = ${params.entrez.timeout }
     max_triples_by_files = ${params.entrez.max_triples_by_files}
-    reference_uri_prefix = http://rdf.ncbi.nlm.nih.gov/pubchem/reference/PMID
-    compound_path = PubChem_Compound/compound/${pubchemVersion}
-    reference_path = PubChem_Reference/reference/${pubchemVersion}
+    reference_uri_prefix = http://rdf.ncbi.nlm.nih.gov/pubchem/reference
+    compound_path = PubChem_Compound/compound/${pubchemVersion.trim()}
+    reference_path = PubChem_Reference/reference/${pubchemVersion.trim()}
     END
     """
 }
