@@ -34,7 +34,7 @@ process build_import_Chemont {
     memory '20 GB'
     cpus 8
     executor 'slurm'
-    
+
     conda 'forum-conda-env.yml'
     
     publishDir params.rdfoutdir, pattern: "ClassyFire"
@@ -50,7 +50,7 @@ process build_import_Chemont {
 
     """
     pip install eutils --quiet
-    python3 -u $app/build/import_Chemont.py --config="$import_PMID_CID" --out="." --log="."
+    python3 -u $app/build/import_Chemont.py --config="$import_Chemont" --out="." --log="."
     """
 }
 
