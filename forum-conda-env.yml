@@ -5,7 +5,7 @@ channels:
   - defaults
   - r
 dependencies:
-  - python=3.8
+  - python=3.10
   - r-base
   - r-essentials
   - rdflib
