@@ -13,3 +13,7 @@ workflow {
     forum_PMID_CID |
     forum_Chemont
 }
+
+workflow.onComplete{
+        println ( workflow.success ? "Workflow done successfully" : "Oops .. something went wrong" )
+}

@@ -40,6 +40,8 @@ export TESTDEV="true"
 ### Genouest
 
 ```bash
+export NXF_EXECUTOR=slurm
+export NXF_OPTS="-Xms500M -Xmx2G" 
 ./nextflow forum.nf -resume -profile genouest
 ```
 

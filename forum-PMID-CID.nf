@@ -30,6 +30,7 @@ process config_import_PMIDCID {
 
 process build_import_PMIDCID {
     debug true
+    memory '10 GB'
     conda 'forum-conda-env.yml'
     
     publishDir params.rdfoutdir, pattern: "PMID_CID"
