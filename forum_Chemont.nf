@@ -33,7 +33,6 @@ process build_import_Chemont {
     debug true
     memory '20 GB'
     cpus 8
-    executor 'slurm'
 
     conda 'forum-conda-env.yml'
     
