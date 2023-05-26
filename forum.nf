@@ -11,7 +11,8 @@ workflow {
     forum_MetaNetX |
     forum_PubChemMin |
     forum_PMID_CID |
-    forum_Chemont
+    forum_Chemont |
+    forum_SBML_Human
 }
 
 workflow.onComplete{
