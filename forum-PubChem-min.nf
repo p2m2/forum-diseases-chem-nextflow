@@ -74,7 +74,7 @@ process config_import_PubChem_mapping {
 
 
 process build_import_PubChem_mapping {
-    debug true
+    debug false
     conda 'forum-conda-env.yml'
     publishDir params.rdfoutdir, pattern: "Id_mapping" , failOnError: true /* TODO: check if MetaNetX mapping exit always !!! */
     publishDir params.rdfoutdir, pattern: "upload_PubChem_mapping.sh" ,overwrite: true, failOnError: true
