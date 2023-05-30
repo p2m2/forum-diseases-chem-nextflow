@@ -1,6 +1,7 @@
 
 process app_forumScripts {
     publishDir params.localForumSources, pattern: 'app'
+    cache false
     output:
         path "app"
 
