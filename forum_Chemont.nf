@@ -38,18 +38,18 @@ process build_import_Chemont {
     
     publishDir params.rdfoutdir, pattern: "ClassyFire"
     publishDir params.rdfoutdir, pattern: "upload_Chemont.sh"
-    publishDir params.logdir, pattern: "*.log"
+    publishDir params.logdir, pattern: "chemont_import.log"
 
     input:
         tuple path(import_Chemont), path(app), path(pubChemInchikeyPath), path(pmidCidPath)
     output:
         path "ClassyFire"
         path "upload_Chemont.sh"
-        path "*.log"
+        path "chemont_import.log"
 
     """
     pip install eutils --quiet
-    python3 -u $app/build/import_Chemont.py --config="$import_Chemont" --out="." --log="."
+    python3 -u $app/build/import_Chemont.py --config="$import_Chemont" --out="." > chemont_import.log
     """
 }
 
