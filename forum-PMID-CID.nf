@@ -39,7 +39,6 @@ process build_import_PMIDCID {
     publishDir params.rdfoutdir, pattern: "PMID_CID"
     publishDir params.rdfoutdir, pattern: "PMID_CID_endpoints"
     publishDir params.rdfoutdir, pattern: "upload_PMID_CID.sh"
-    publishDir params.logdir, pattern: "*.log"
     */
     /*
         pubChemCompound and pubChemReference must be as input to reach turtle files by the import_PMID_CID.py process
@@ -50,7 +49,6 @@ process build_import_PMIDCID {
         path "PMID_CID"
         path "PMID_CID_endpoints"
         path "upload_PMID_CID.sh"
-        path "*.log"
 
     """
     pip install eutils --quiet

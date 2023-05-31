@@ -26,7 +26,6 @@ process build_import_MetaNetX {
     /*
     publishDir params.rdfoutdir, pattern: "MetaNetX"
     publishDir params.rdfoutdir, pattern: "upload_MetaNetX.sh"
-    publishDir params.logdir, pattern: "*.log"
     */
 
     input:
@@ -35,7 +34,6 @@ process build_import_MetaNetX {
     output:
         path "MetaNetX"
         path "upload_MetaNetX.sh"
-        path "*.log"
 
     """
     python3 -u $app/build/import_MetaNetX.py --config="$import_MetaNetX" --out="." --log="."
@@ -71,7 +69,6 @@ process build_import_MetaNetX_mapping {
     publishDir "${params.rdfoutdir}/Id_mapping/Inter/", pattern: "MetaNetX"
     publishDir "${params.rdfoutdir}/Id_mapping/Intra/", pattern: "MetaNetX"
     publishDir params.rdfoutdir, pattern: "upload_MetaNetX_mapping.sh"
-    publishDir params.logdir, pattern: "*.log"
     */
 
     input:
@@ -82,7 +79,6 @@ process build_import_MetaNetX_mapping {
         //path "Id_mapping/Intra/MetaNetX"
         path "Id_mapping"
         path "upload_MetaNetX_mapping.sh"
-        path "*.log"
 
     """
     python3 -u $app/build/import_MetaNetX_mapping.py --config="$import_MetaNetX_mapping" --out="." > metanetx_mapping.log

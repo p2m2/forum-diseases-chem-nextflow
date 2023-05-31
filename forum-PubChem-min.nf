@@ -36,7 +36,6 @@ process build_import_PubChemMin {
     publishDir params.rdfoutdir, pattern: "PubChem_Reference" ,overwrite: true, failOnError: true
     publishDir params.rdfoutdir, pattern: "PubChem_Synonym" ,overwrite: true, failOnError: true
     publishDir params.rdfoutdir, pattern: "upload_PubChem_minimal.sh" ,overwrite: true, failOnError: true
-    publishDir params.logdir, pattern: "*.log" ,overwrite: true
     */
     input:
         tuple path(import_PubChem_min), path(app)
@@ -47,7 +46,6 @@ process build_import_PubChemMin {
         path "PubChem_Reference"
         path "PubChem_Synonym"
         path "upload_PubChem_minimal.sh"
-        path "*.log"
        
     """
     python3 -u $app/build/import_PubChem.py --config="$import_PubChem_min" --out="." --log="."
@@ -86,7 +84,6 @@ process build_import_PubChem_mapping {
     publishDir "${params.rdfoutdir}/Id_mapping/Inter/", pattern: "PubChem" , failOnError: true
     publishDir "${params.rdfoutdir}/Id_mapping/Intra/", pattern: "PubChem" , failOnError: true
     publishDir params.rdfoutdir, pattern: "upload_PubChem_mapping.sh" ,overwrite: true, failOnError: true
-    publishDir params.logdir, pattern: "*.log" ,overwrite: true
     */
     input:
         tuple path(import_PubChem_mapping), path(app), path(pubChemCoumpoundPath), path(pubChemDescriptor), path(pubChemInchiKey), path(pubChemReference), path(pubChemSynonym)
@@ -97,7 +94,6 @@ process build_import_PubChem_mapping {
         */
         path "Id_mapping"
         path "upload_PubChem_mapping.sh"
-        path "*.log"
        
     """
     python3 -u $app/build/import_PubChem_mapping.py --config="$import_PubChem_mapping" --out="." > pubchem_mapping.log

@@ -25,16 +25,15 @@ process build_importMesh {
     storeDir params.rdfoutdir
     /*
     publishDir params.rdfoutdir, pattern: "MeSH"
-    publishDir params.rdfoutdir, pattern: "upload_MeSH"
+    publishDir params.rdfoutdir, pattern: "upload_MeSH.sh"
     publishDir params.logdir, pattern: "*.log"
     */
-    
+
     input:
         tuple path(import_MeSH), path(app)
     output:
         path "MeSH"
         path "upload_MeSH.sh"
-        path "*.log"
 
     """
     python3 -u $app/build/import_MeSH.py --config="$import_MeSH" --out="." --log="."

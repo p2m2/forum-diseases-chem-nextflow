@@ -46,7 +46,6 @@ process build_import_Chemont {
     output:
         path "ClassyFire"
         path "upload_Chemont.sh"
-        path "chemont_import.log"
 
     """
     pip install eutils --quiet
