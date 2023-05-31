@@ -30,7 +30,7 @@ process config_import_Chemont {
 
 
 process build_import_Chemont {
-    debug true
+    debug false
     memory '20 GB'
     cpus 8
 
