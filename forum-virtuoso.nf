@@ -1,34 +1,63 @@
 include { workflow_forumScripts } from './forum-source-repository'
 
 process run_virtuoso {
-    publishDir params.virtuosoPersitenceDir
+    debug false
     input:
         path workflowDir
-        path rdfoutdir
-        path upload_sh
+        val listScriptSh
     output:
-        path "${params.virtuosoPersitenceDir}/data"
-        path "${params.virtuosoPersitenceDir}/docker-compose.yml"
+        val true
+        path "data"
+        path "docker-compose.yml"
 
+    /* -s <dir> dir should not be a symbolink link => ${params.rdfoutdir} is an absolute path */
     """
-    $workflowDir/w_virtuoso.sh -d ${params.virtuosoPersitenceDir} -s $rdfoutdir -c start $upload_sh
+    $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c start ${listScriptSh}
     """
 }
 
-/*
+
 process shutdown_virtuoso {
     input:
-        tuple path(workflowDir), path(rdfoutdir)
+        val ready
+        path workflowDir
+        path data
+        path docker_compose
 
     """
-    $workflowDir/w_virtuoso.sh -d ${params.virtuosoPersitenceDir} -s $rdfoutdir -c stop
+    $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c stop
     """
-}*/
+}
 
-workflow {
-    rdfoutdir = Channel.fromPath("${params.rdfoutdir}")
-    upload_sh = Channel.fromPath("${params.rdfoutdir}/upload.sh")
-    workflow_forumScripts()
-    run_virtuoso(workflow_forumScripts.out,rdfoutdir,upload_sh)
-   // workflow_forumScripts.out.combine(rdfoutdir) | shutdown_virtuoso
+process test_virtuoso_request {
+    debug true
+    input:
+        val ready
+    output:
+        val true // finnished!
+
+    """
+    curl -H "Accept: application/json" -G http://localhost:9980/sparql --data-urlencode query='select distinct ?type where { ?thing a ?type } limit 1'
+    """
+}
+
+
+workflow forum_test_virtuoso() {
+   
+    app = workflow_forumScripts()
+    //listScript = Channel.from( "upload.sh upload_MetaNetX.sh")
+    // only vocabularies for teting virtuoso 
+    listScript = Channel.from( "upload.sh")
+    run_virtuoso(app,listScript) 
+
+    // 1 run virtuoso
+    readyToRequestVirtuoso = run_virtuoso.out[0]
+    data = run_virtuoso.out[1]
+    docker_compose = run_virtuoso.out[2]
+
+    // 2 request virtuoso
+    readyToCloseVirtuoso = test_virtuoso_request(readyToRequestVirtuoso)
+
+    // 3 close virtuoso
+    shutdown_virtuoso(readyToCloseVirtuoso, app, data, docker_compose)
 }

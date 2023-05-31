@@ -15,7 +15,7 @@ process app_forumScripts {
 
 process workflow_forumScripts {
     conda 'forum-conda-env.yml'
-    //cache false
+    cache false
     publishDir params.localForumSources, pattern: 'workflow'
     // force the update of workflow directory. useful to debug the workflow
     output:
