@@ -61,23 +61,21 @@ process config_import_MetaNetX_mapping {
 }
 
 process build_import_MetaNetX_mapping {
+    storeDir params.rdfoutdir
     conda 'forum-conda-env.yml'
     memory '40 GB'
-    storeDir params.rdfoutdir
-
-    /*
-    publishDir "${params.rdfoutdir}/Id_mapping/Inter/", pattern: "MetaNetX"
-    publishDir "${params.rdfoutdir}/Id_mapping/Intra/", pattern: "MetaNetX"
-    publishDir params.rdfoutdir, pattern: "upload_MetaNetX_mapping.sh"
-    */
+    
+    //publishDir "${params.rdfoutdir}/Id_mapping/Inter/", pattern: "MetaNetX"
+    //publishDir "${params.rdfoutdir}/Id_mapping/Intra/", pattern: "MetaNetX"
+    //publishDir params.rdfoutdir, pattern: "upload_MetaNetX_mapping.sh"
+    
 
     input:
         tuple path(import_MetaNetX_mapping), path(app), path(metaNetX)
 
     output:
-        //path "Id_mapping/Inter/MetaNetX"
-        //path "Id_mapping/Intra/MetaNetX"
-        path "Id_mapping"
+        path "Id_mapping/Inter/MetaNetX"
+        path "Id_mapping/Intra/MetaNetX"
         path "upload_MetaNetX_mapping.sh"
 
     """
