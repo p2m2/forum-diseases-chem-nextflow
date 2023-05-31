@@ -16,6 +16,22 @@ process run_virtuoso {
     """
 }
 
+process disbled_checkpoint {
+    debug true
+    input:
+        val ready
+        path workflowDir
+        path data
+        path docker_compose
+    
+    output:
+        val true 
+
+    """
+    $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c fix
+    """
+}
+
 
 process shutdown_virtuoso {
     input:
@@ -49,15 +65,18 @@ workflow forum_test_virtuoso() {
     // only vocabularies for teting virtuoso 
     listScript = Channel.from( "upload.sh")
     run_virtuoso(app,listScript) 
-
+    
     // 1 run virtuoso
-    readyToRequestVirtuoso = run_virtuoso.out[0]
+    readyToDisableCheckpoint = run_virtuoso.out[0]
     data = run_virtuoso.out[1]
     docker_compose = run_virtuoso.out[2]
+    
+    // 2 disable checkpoint to improve performance
+    readyToRequestVirtuoso = disbled_checkpoint(readyToDisableCheckpoint,app,data,docker_compose)
 
-    // 2 request virtuoso
+    // 3 request virtuoso
     readyToCloseVirtuoso = test_virtuoso_request(readyToRequestVirtuoso)
 
-    // 3 close virtuoso
+    // 4 close virtuoso
     shutdown_virtuoso(readyToCloseVirtuoso, app, data, docker_compose)
 }
