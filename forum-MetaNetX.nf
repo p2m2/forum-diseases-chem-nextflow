@@ -28,7 +28,7 @@ process build_import_MetaNetX {
     publishDir params.rdfoutdir, pattern: "upload_MetaNetX.sh"
     publishDir params.logdir, pattern: "*.log"
     */
-    
+
     input:
         tuple path(import_MetaNetX), path(app)
 
