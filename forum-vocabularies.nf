@@ -1,7 +1,9 @@
 
+vocabularydir="${params.rdfoutdir}/vocabulary"
+
 process download_chebi_vocabulary {
     conda 'wget'
-    publishDir params.vocabularydir
+    storeDir "${vocabularydir}"
     maxRetries 3
     output:
         path 'chebi.owl'
@@ -26,7 +28,7 @@ process chebiVersion {
 
 process download_mesh_vocabulary {
     conda 'wget'
-    publishDir params.vocabularydir
+    storeDir "${vocabularydir}"
     maxRetries 3
 
     output:
@@ -39,7 +41,7 @@ process download_mesh_vocabulary {
 
 process download_cito_vocabulary {
     conda 'wget'
-    publishDir params.vocabularydir
+    storeDir "${vocabularydir}"
     maxRetries 3
 
     output:
@@ -52,7 +54,7 @@ process download_cito_vocabulary {
 
 process download_fabio_vocabulary {
     conda 'wget'
-    publishDir params.vocabularydir
+    storeDir "${vocabularydir}"
     maxRetries 3
 
     output:
@@ -65,7 +67,7 @@ process download_fabio_vocabulary {
 
 process download_dublincore_vocabulary {
     conda 'wget'
-    publishDir params.vocabularydir
+    storeDir "${vocabularydir}"
     maxRetries 3
 
     output:
@@ -78,7 +80,7 @@ process download_dublincore_vocabulary {
 
 process download_cheminf_vocabulary {
     conda 'wget'
-    publishDir params.vocabularydir
+    storeDir "${vocabularydir}"
     maxRetries 3
 
     output:
@@ -91,7 +93,7 @@ process download_cheminf_vocabulary {
 
 process download_skos_vocabulary {
     conda 'wget'
-    publishDir params.vocabularydir
+    storeDir "${vocabularydir}"
     maxRetries 3
 
     output:
@@ -104,7 +106,7 @@ process download_skos_vocabulary {
 
 process download_ChemOnt2_1_vocabulary {
     conda 'wget openjdk'
-    publishDir params.vocabularydir
+    storeDir "${vocabularydir}"
     maxRetries 3
 
     output:
@@ -139,7 +141,8 @@ process chemontVersion {
 
 
 process build_upload_sh {
-    publishDir params.rdfoutdir
+    storeDir params.rdfoutdir
+    
     input:
         path mesh_vocabulary
         path skos
@@ -215,14 +218,14 @@ process build_upload_sh {
     DB.DBA.XML_SET_NS_DECL ('chemont', 'http://purl.obolibrary.org/obo/CHEMONTID_', 2);
     DB.DBA.XML_SET_NS_DECL ('chebi', 'http://purl.obolibrary.org/obo/CHEBI_', 2);
     delete from DB.DBA.load_list ;
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${mesh_vocabulary.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${skos.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${fabio.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${dublin_core_terms.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${cito.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${cheminf.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${chebi.fileName}', 'https://forum.semantic-metabolomics.org/ChEBI/${chebi_version.trim()}');
-    ld_dir_all ('./dumps/${params.vocabularydir.split("/").last()}/', '${chemOnt_2_1.fileName}', 'https://forum.semantic-metabolomics.org/ChemOnt/${chemont_version.trim()}');
+    ld_dir_all ('./dumps/${vocabularydir.split("/").last()}/', '${mesh_vocabulary.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
+    ld_dir_all ('./dumps/${vocabularydir.split("/").last()}/', '${skos.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
+    ld_dir_all ('./dumps/${vocabularydir.split("/").last()}/', '${fabio.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
+    ld_dir_all ('./dumps/${vocabularydir.split("/").last()}/', '${dublin_core_terms.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
+    ld_dir_all ('./dumps/${vocabularydir.split("/").last()}/', '${cito.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
+    ld_dir_all ('./dumps/${vocabularydir.split("/").last()}/', '${cheminf.fileName}', 'https://forum.semantic-metabolomics.org/inference-rules');
+    ld_dir_all ('./dumps/${vocabularydir.split("/").last()}/', '${chebi.fileName}', 'https://forum.semantic-metabolomics.org/ChEBI/${chebi_version.trim()}');
+    ld_dir_all ('./dumps/${vocabularydir.split("/").last()}/', '${chemOnt_2_1.fileName}', 'https://forum.semantic-metabolomics.org/ChemOnt/${chemont_version.trim()}');
     select * from DB.DBA.load_list;
     rdf_loader_run();
     checkpoint;

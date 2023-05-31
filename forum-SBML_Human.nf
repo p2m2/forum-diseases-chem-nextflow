@@ -44,16 +44,19 @@ process config_Human1_1_7 {
 
 process build_importSBML {
     conda 'forum-conda-env.yml'
-
+    
+    storeDir params.rdfoutdir
+        /*
     publishDir params.rdfoutdir, pattern: "GEM"
-    publishDir params.rdfoutdir, pattern: "Id_mapping"
+    publishDir "${params.rdfoutdir}/Id_mapping/Intra/", pattern: "Id_mapping/Intra/SBML"
     publishDir params.rdfoutdir, pattern: "upload_Human1_1.7.sh"
     publishDir params.logdir, pattern: "*.log"
-
+    */
     input:
         tuple path(config_Human1_1_7), path(app), path(human1_1_7_sbml)
     output:
         path "GEM"
+        //path "Id_mapping/Intra/SBML"
         path "Id_mapping"
         path "upload_Human1_1.7.sh"
         path "*.log"

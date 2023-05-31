@@ -14,3 +14,5 @@ dependencies:
   - numpy
   - pandas
   - bs4
+  - git
+  - requests

@@ -25,6 +25,11 @@ process config_import_PubChemMin {
 process build_import_PubChemMin {
     debug false
     conda 'forum-conda-env.yml'
+    
+    storeDir params.rdfoutdir
+
+    maxRetries 3
+    /*
     publishDir params.rdfoutdir, pattern: "PubChem_Compound" ,overwrite: true, failOnError: true
     publishDir params.rdfoutdir, pattern: "PubChem_Descriptor" ,overwrite: true, failOnError: true
     publishDir params.rdfoutdir, pattern: "PubChem_InchiKey" ,overwrite: true, failOnError: true
@@ -32,7 +37,7 @@ process build_import_PubChemMin {
     publishDir params.rdfoutdir, pattern: "PubChem_Synonym" ,overwrite: true, failOnError: true
     publishDir params.rdfoutdir, pattern: "upload_PubChem_minimal.sh" ,overwrite: true, failOnError: true
     publishDir params.logdir, pattern: "*.log" ,overwrite: true
-    
+    */
     input:
         tuple path(import_PubChem_min), path(app)
     output:
@@ -76,13 +81,20 @@ process config_import_PubChem_mapping {
 process build_import_PubChem_mapping {
     debug false
     conda 'forum-conda-env.yml'
-    publishDir params.rdfoutdir, pattern: "Id_mapping" , failOnError: true /* TODO: check if MetaNetX mapping exit always !!! */
+    storeDir params.rdfoutdir
+    /*
+    publishDir "${params.rdfoutdir}/Id_mapping/Inter/", pattern: "PubChem" , failOnError: true
+    publishDir "${params.rdfoutdir}/Id_mapping/Intra/", pattern: "PubChem" , failOnError: true
     publishDir params.rdfoutdir, pattern: "upload_PubChem_mapping.sh" ,overwrite: true, failOnError: true
     publishDir params.logdir, pattern: "*.log" ,overwrite: true
-    
+    */
     input:
         tuple path(import_PubChem_mapping), path(app), path(pubChemCoumpoundPath), path(pubChemDescriptor), path(pubChemInchiKey), path(pubChemReference), path(pubChemSynonym)
     output:
+    /*
+        path "Id_mapping/Inter/PubChem"
+        path "Id_mapping/Intra/PubChem"
+        */
         path "Id_mapping"
         path "upload_PubChem_mapping.sh"
         path "*.log"

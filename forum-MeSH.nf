@@ -22,11 +22,13 @@ process config_import_MeSH {
 
 process build_importMesh {
     conda 'forum-conda-env.yml'
-
+    storeDir params.rdfoutdir
+    /*
     publishDir params.rdfoutdir, pattern: "MeSH"
     publishDir params.rdfoutdir, pattern: "upload_MeSH"
     publishDir params.logdir, pattern: "*.log"
-
+    */
+    
     input:
         tuple path(import_MeSH), path(app)
     output:

@@ -30,13 +30,17 @@ process config_import_PMIDCID {
 
 process build_import_PMIDCID {
     debug true
-    memory '10 GB'
+    memory '40 GB'
     conda 'forum-conda-env.yml'
+
+    storeDir params.rdfoutdir
     
+    /*
     publishDir params.rdfoutdir, pattern: "PMID_CID"
     publishDir params.rdfoutdir, pattern: "PMID_CID_endpoints"
     publishDir params.rdfoutdir, pattern: "upload_PMID_CID.sh"
     publishDir params.logdir, pattern: "*.log"
+    */
     /*
         pubChemCompound and pubChemReference must be as input to reach turtle files by the import_PMID_CID.py process
     */

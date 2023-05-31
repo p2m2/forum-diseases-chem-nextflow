@@ -35,11 +35,12 @@ process build_import_Chemont {
     cpus 8
 
     conda 'forum-conda-env.yml'
-    
+    storeDir params.rdfoutdir
+    /*
     publishDir params.rdfoutdir, pattern: "ClassyFire"
     publishDir params.rdfoutdir, pattern: "upload_Chemont.sh"
     publishDir params.logdir, pattern: "chemont_import.log"
-
+    */
     input:
         tuple path(import_Chemont), path(app), path(pubChemInchikeyPath), path(pmidCidPath)
     output:
@@ -49,7 +50,7 @@ process build_import_Chemont {
 
     """
     pip install eutils --quiet
-    python3 -u $app/build/import_Chemont.py --config="$import_Chemont" --out="." > chemont_import.log
+    python3 -u $app/build/import_Chemont.py --config="$import_Chemont" --out="." --log="." > chemont_import.log
     """
 }
 
