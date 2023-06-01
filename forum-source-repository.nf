@@ -22,8 +22,6 @@ process workflow_forumScripts {
         path 'workflow'
 
     """
-    ls
-    which git
     git clone ${params.repogit} repo -b nextflow
     mv repo/workflow .
     """

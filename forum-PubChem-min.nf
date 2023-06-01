@@ -79,6 +79,7 @@ process config_import_PubChem_mapping {
 process build_import_PubChem_mapping {
     debug false
     conda 'forum-conda-env.yml'
+    memory '40 GB'
     storeDir params.rdfoutdir
     /*
     publishDir "${params.rdfoutdir}/Id_mapping/Inter/", pattern: "PubChem" , failOnError: true
@@ -88,11 +89,8 @@ process build_import_PubChem_mapping {
     input:
         tuple path(import_PubChem_mapping), path(app), path(pubChemCoumpoundPath), path(pubChemDescriptor), path(pubChemInchiKey), path(pubChemReference), path(pubChemSynonym)
     output:
-    /*
         path "Id_mapping/Inter/PubChem"
         path "Id_mapping/Intra/PubChem"
-        */
-        path "Id_mapping"
         path "upload_PubChem_mapping.sh"
        
     """

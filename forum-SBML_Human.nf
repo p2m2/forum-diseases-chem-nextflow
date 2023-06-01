@@ -55,8 +55,7 @@ process build_importSBML {
         tuple path(config_Human1_1_7), path(app), path(human1_1_7_sbml)
     output:
         path "GEM"
-        //path "Id_mapping/Intra/SBML"
-        path "Id_mapping"
+        path "Id_mapping/Intra/SBML"
         path "upload_Human1_1.7.sh"
 
     """

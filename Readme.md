@@ -25,6 +25,7 @@ conda create -p ~/env-forum openjdk
 cd forum-diseases-chem-nextflow
 # -p bigmem 3 To RAM
 srun --cpus-per-task=8 --mem=50G --pty bash
+. /local/env/envconda.sh
 conda activate ~/env-forum
 alias ll='ls -ail'
 curl -s https://get.nextflow.io | bash
