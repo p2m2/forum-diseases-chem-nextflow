@@ -1,20 +1,22 @@
-include { app_forumScripts } from './forum-source-repository'
-include { run_virtuoso ;  disbled_checkpoint ; shutdown_virtuoso } from './forum-virtuoso'
+include { workflow_forumScripts } from './forum-source-repository'
+include { run_virtuoso ;  disabled_checkpoint ; shutdown_virtuoso ; test_virtuoso_request ; waitProdDir } from './forum-virtuoso'
+include { pubchemVersion } from './forum-PubChem-min'
+include { meSHVersion } from './forum-MeSH'
 
 ncpu = 12
 memReq = '80 GB'
 
-
 process config_computation {
     publishDir "${params.configdir}/computation/CID_MESH/"
     input:
+        val meshVersion
         val pubchemVersion
 
     output:
         path 'config.ini'
 
     """
-    tee -a import_MeSH.ini << END
+    tee -a config.ini << END
     [DEFAULT]
     split = False
     file_size = 100000
@@ -24,7 +26,7 @@ process config_computation {
     graph_from = https://forum.semantic-metabolomics.org/PMID_CID/${params.forumRelease}
                 https://forum.semantic-metabolomics.org/PMID_CID_endpoints/${params.forumRelease}
                 https://forum.semantic-metabolomics.org/PubChem/reference/${pubchemVersion.trim()}
-                https://forum.semantic-metabolomics.org/MeSHRDF/${pubchemVersion.trim()}
+                https://forum.semantic-metabolomics.org/MeSHRDF/${meshVersion.trim()}
     [X_Y]
     name = CID_MESH
     Request_name = count_distinct_pmids_by_CID_MESH
@@ -112,20 +114,66 @@ process config_enrichment_analysis {
 process computation {
     cpus ncpu
     memory memReq
+    storeDir params.rdfoutdir
     input:
+        val ready
         path workflowDir
         path configComputation
+        path configEnrichmentAnalysis
     output:
         path "EnrichmentAnalysis/CID_MESH"
-        path "*.log"
 
     """
     $workflowDir/w_computation.sh -v ${params.forumRelease} \
-           -m $configComputation \
-           -t $configEnrichmentAnalysis \
-           -u CID_MESH \
-           -d  ${params.logdir} \
-           -s ${params.rdfoutdir} \
-           -l ${params.logdir} > computation_cid_mesh.log
+        -m $configComputation \
+        -t $configEnrichmentAnalysis \
+        -u CID_MESH \
+        -d  ${params.logdir} \
+        -s ${params.rdfoutdir} \
+        -l ${params.logdir} > computation_cid_mesh.log
     """
+}
+
+workflow forum_computation_cid_mesh() {
+
+    app = workflow_forumScripts()
+    listScripts = Channel.fromList([
+        "${params.rdfoutdir}/upload.sh",
+        "${params.rdfoutdir}/upload_PMID_CID.sh",
+        "${params.rdfoutdir}/upload_MeSH.sh",
+        "${params.rdfoutdir}/upload_PubChem_minimal.sh"
+    ])
+    
+    listScripts.view()
+
+    namesScripts = 
+    listScripts
+        .reduce { a,b -> 
+            a.split("/").last() + " " + b.split("/").last()
+            }
+
+    gatherResults = waitProdDir(listScripts).collect()
+    run_virtuoso(gatherResults,app,namesScripts)
+
+    // 1 run virtuoso
+    readyToDisableCheckpoint = run_virtuoso.out[0]
+    data = run_virtuoso.out[1]
+    docker_compose = run_virtuoso.out[2]
+    
+    // 2 disable checkpoint to improve performance
+    readyToRequestVirtuoso = disabled_checkpoint(readyToDisableCheckpoint,app,data,docker_compose)
+
+    // 3 request virtuoso
+    readyToCloseVirtuoso = test_virtuoso_request(readyToRequestVirtuoso)
+
+    // 4 computation
+    pubchemVersion=pubchemVersion(gatherResults)
+    meshVersion = meSHVersion(gatherResults)
+
+    computation(readyToCloseVirtuoso,app,
+    config_computation(meshVersion,pubchemVersion),
+    config_enrichment_analysis(meshVersion,pubchemVersion))
+
+    // 5 close virtuoso
+    shutdown_virtuoso(readyToCloseVirtuoso, app, data, docker_compose) 
 }

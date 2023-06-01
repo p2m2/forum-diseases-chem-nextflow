@@ -3,6 +3,7 @@ include { workflow_forumScripts } from './forum-source-repository'
 process run_virtuoso {
     debug false
     input:
+        val ready
         path workflowDir
         val listScriptSh
     output:
@@ -12,11 +13,12 @@ process run_virtuoso {
 
     /* -s <dir> dir should not be a symbolink link => ${params.rdfoutdir} is an absolute path */
     """
+    echo "script to load:$listScriptSh"
     $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c start ${listScriptSh}
     """
 }
 
-process disbled_checkpoint {
+process disabled_checkpoint {
     debug true
     input:
         val ready
@@ -57,22 +59,49 @@ process test_virtuoso_request {
     """
 }
 
+process waitProdDir {
+    debug true
+    input:
+        val scriptsToWait
+    output: 
+        val true
+
+    """
+    echo "==== Waiting for $scriptsToWait ===="
+    
+    while [ ! -e ${scriptsToWait} ]
+    do 
+        sleep 1
+    done
+    """
+}
+
 
 workflow forum_test_virtuoso() {
    
     app = workflow_forumScripts()
-    //listScript = Channel.from( "upload.sh upload_MetaNetX.sh")
-    // only vocabularies for teting virtuoso 
-    listScript = Channel.from( "upload.sh")
-    run_virtuoso(app,listScript) 
+    listScripts = Channel.fromList([
+        "${params.rdfoutdir}/upload.sh"
+    ])
+    // need scripts name to give args
+    namesScripts = 
+    listScripts
+        .reduce { a,b -> 
+            a.split("/").last() + " " + b.split("/").last()
+            }
     
+    // check existence and gather the results
+    gatherResults = waitProdDir(listScripts).collect()
+
     // 1 run virtuoso
+    run_virtuoso(gatherResults,app,namesScripts) 
+    
     readyToDisableCheckpoint = run_virtuoso.out[0]
     data = run_virtuoso.out[1]
     docker_compose = run_virtuoso.out[2]
     
     // 2 disable checkpoint to improve performance
-    readyToRequestVirtuoso = disbled_checkpoint(readyToDisableCheckpoint,app,data,docker_compose)
+    readyToRequestVirtuoso = disabled_checkpoint(readyToDisableCheckpoint,app,data,docker_compose)
 
     // 3 request virtuoso
     readyToCloseVirtuoso = test_virtuoso_request(readyToRequestVirtuoso)

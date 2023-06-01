@@ -1,4 +1,5 @@
 include { app_forumScripts } from './forum-source-repository'
+include { pubchemVersion } from './forum-PubChem-min'
 
 process config_import_Chemont {
     publishDir params.configdir
@@ -22,7 +23,7 @@ process config_import_Chemont {
     path = PMID_CID/${params.forumRelease}
     [INCHIKEY]
     mask = pc_inchikey2compound_*.ttl.gz
-    path = PubChem_InchiKey/inchikey/${pubchemVersion}
+    path = PubChem_InchiKey/inchikey/${pubchemVersion.trim()}
     END
     """
 }
@@ -67,17 +68,6 @@ process waitPubChemAndPmidCid {
     """
 }
 
-/* val ready : waiting for results of waitPubChem process */
-process pubchemVersion {
-    input:
-        val ready
-        path pubChemInchikeyDir
-    output: stdout
-    """
-    ls ${pubChemInchikeyDir}/inchikey/
-    """
-}
-
 workflow forum_Chemont() {
     
     /* dependencies */
@@ -89,7 +79,7 @@ workflow forum_Chemont() {
     waitPubChemAndPmidCid(inchikey,pmidCidReleasePath)
 
     config_import_Chemont(
-        pubchemVersion(waitPubChemAndPmidCid.out,inchikey))
+        pubchemVersion(waitPubChemAndPmidCid.out))
         .combine(app_forumScripts()) 
         .combine(inchikey) 
         .combine(pmidCidPath) 

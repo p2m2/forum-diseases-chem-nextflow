@@ -1,4 +1,5 @@
 include { app_forumScripts } from './forum-source-repository'
+include { pubchemVersion ; waitPubChem } from './forum-PubChem-min'
 
 process config_import_PMIDCID {
     publishDir params.configdir
@@ -58,30 +59,6 @@ process build_import_PMIDCID {
 
 /* Use state-dependency pattern : https://github.com/nextflow-io/patterns/blob/master/docs/state-dependency.md */
 
-process waitPubChem {
-    input:
-        path pubChemCompoundDir
-        path pubChemReferenceDir
-    output: 
-        val true
-    
-    """
-    echo "==== Waiting for $pubChemCompoundDir and $pubChemReferenceDir ===="
-    while [ ! -e ${pubChemCompoundDir} ] || [ ! -e ${pubChemReferenceDir} ]; do sleep 1; done
-    """
-}
-
-/* val ready : waiting for results of waitPubChem process */
-process pubchemVersion {
-    input:
-        val ready
-        path pubChemCompoundDir
-    output: stdout
-    """
-    ls ${pubChemCompoundDir}/compound/
-    """
-}
-
 workflow forum_PMID_CID() {
     
     /* dependencies */
@@ -89,10 +66,10 @@ workflow forum_PMID_CID() {
     compound = Channel.fromPath("${params.rdfoutdir}/PubChem_Compound")
     reference = Channel.fromPath("${params.rdfoutdir}/PubChem_Reference")
     
-    waitPubChem(compound,reference)
+    waitPubChem()
 
     config_import_PMIDCID(
-        pubchemVersion(waitPubChem.out,compound))
+        pubchemVersion(waitPubChem.out))
         .combine(app_forumScripts())
         .combine(compound) 
         .combine(reference) 

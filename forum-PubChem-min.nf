@@ -92,33 +92,33 @@ process build_import_PubChem_mapping {
         path "Id_mapping/Inter/PubChem"
         path "Id_mapping/Intra/PubChem"
         path "upload_PubChem_mapping.sh"
-       
+
     """
     python3 -u $app/build/import_PubChem_mapping.py --config="$import_PubChem_mapping" --out="." > pubchem_mapping.log
     """
 }
 
 
-process waitPubchemCoumpoundPath {
-    input:
-        path pubchemCoumpoundPath
+process waitPubChem {
     output: 
         val true
     
     """
-    echo "==== Waiting for $pubchemCoumpoundPath ===="
-    while [ ! -e ${pubchemCoumpoundPath} ] ; do sleep 1; done
+    echo "==== Waiting for upload_PubChem_minimal.sh ===="
+    while [ ! -e ${params.rdfoutdir}/upload_PubChem_minimal.sh"  ]
+    do 
+        sleep 1
+    done
     """
 }
 
-/* val ready : waiting for results of waitPubchemCoumpoundPath process */
+/* val ready : waiting for results of waitPubChem process */
 process pubchemVersion {
     input:
         val ready
-        path pubChemCompoundDir
     output: stdout
     """
-    ls ${pubChemCompoundDir}/compound/
+    ls ${params.rdfoutdir}/PubChem_Compound/compound/ | tr -d '\r' 
     """
 }
 
@@ -134,9 +134,9 @@ workflow forum_PubChemMin() {
     referencePath = build_import_PubChemMin.out[3]
     synonymPath = build_import_PubChemMin.out[4]
 
-    waitPubchemCoumpoundPath(compondPath)
+    waitPubChem()
 
-    config_import_PubChem_mapping(waitPubchemCoumpoundPath.out,pubchemVersion(waitPubchemCoumpoundPath.out,compondPath))
+    config_import_PubChem_mapping(waitPubChem.out,pubchemVersion(waitPubChem.out))
         .combine(app)
         .combine(compondPath).combine(descPath).combine(inchiPath).combine(referencePath).combine(synonymPath) 
         | build_import_PubChem_mapping
