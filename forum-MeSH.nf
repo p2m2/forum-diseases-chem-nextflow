@@ -46,7 +46,7 @@ process waitMeSH {
     
     """
     echo "==== Waiting for upload_MeSH.sh ===="
-    while [ ! -e ${params.rdfoutdir}/upload_MeSH.sh" ]
+    while [ ! -e ${params.rdfoutdir}/upload_MeSH.sh ]
     do 
         sleep 1
     done

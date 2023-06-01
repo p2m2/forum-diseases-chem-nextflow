@@ -105,7 +105,7 @@ process waitPubChem {
     
     """
     echo "==== Waiting for upload_PubChem_minimal.sh ===="
-    while [ ! -e ${params.rdfoutdir}/upload_PubChem_minimal.sh"  ]
+    while [ ! -e ${params.rdfoutdir}/upload_PubChem_minimal.sh  ]
     do 
         sleep 1
     done
