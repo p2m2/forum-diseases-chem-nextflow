@@ -108,11 +108,23 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 ## Testing Computation
 
 ```bash
-./nextflow run forum-virtuoso.nf -entry forum_test_virtuoso -resume
+./nextflow run forum-computation-virtuoso.nf -entry test_virtuoso -resume
 ```
 
 ## Computation
 
+### docker command
+
+```
+docker logs forum_virtuoso_9980 -f
+```
+
+```
+docker rm -f forum_virtuoso_9980
+```
+
+
 ```bash
-./nextflow run forum-computation-cid-mesh.nf -entry forum_computation_cid_mesh
+./nextflow run forum-computation-cid-mesh.nf -entry computation_cid_mesh
+./nextflow run forum-computation-chebi-mesh.nf -entry computation_chebi_mesh
 ```
