@@ -1,4 +1,4 @@
-include { workflow_forumScripts } from './forum-source-repository'
+include { app_forumScripts, workflow_forumScripts } from './forum-source-repository'
 include { run_virtuoso ;  disabled_checkpoint ; shutdown_virtuoso ; test_virtuoso_request ; waitProdDir } from './forum-virtuoso'
 include { pubchemVersion } from './forum-PubChem-min'
 include { meSHVersion } from './forum-MeSH'
@@ -117,11 +117,13 @@ process computation {
     storeDir params.rdfoutdir
     input:
         val ready
+        path appDir
         path workflowDir
         path configComputation
         path configEnrichmentAnalysis
     output:
         path "EnrichmentAnalysis/CID_MESH"
+        path "upload_CID_MESH_EA.sh"
 
     """
     $workflowDir/w_computation.sh -v ${params.forumRelease} \
@@ -136,7 +138,10 @@ process computation {
 
 workflow forum_computation_cid_mesh() {
 
-    app = workflow_forumScripts()
+    app = app_forumScripts()
+    workflow = workflow_forumScripts()
+
+
     listScripts = Channel.fromList([
         "${params.rdfoutdir}/upload.sh",
         "${params.rdfoutdir}/upload_PMID_CID.sh",
@@ -153,7 +158,7 @@ workflow forum_computation_cid_mesh() {
             }
 
     gatherResults = waitProdDir(listScripts).collect()
-    run_virtuoso(gatherResults,app,namesScripts)
+    run_virtuoso(gatherResults,workflow,namesScripts)
 
     // 1 run virtuoso
     readyToDisableCheckpoint = run_virtuoso.out[0]
@@ -161,7 +166,7 @@ workflow forum_computation_cid_mesh() {
     docker_compose = run_virtuoso.out[2]
     
     // 2 disable checkpoint to improve performance
-    readyToRequestVirtuoso = disabled_checkpoint(readyToDisableCheckpoint,app,data,docker_compose)
+    readyToRequestVirtuoso = disabled_checkpoint(readyToDisableCheckpoint,workflow,data,docker_compose)
 
     // 3 request virtuoso
     readyToCloseVirtuoso = test_virtuoso_request(readyToRequestVirtuoso)
@@ -170,10 +175,10 @@ workflow forum_computation_cid_mesh() {
     pubchemVersion=pubchemVersion(gatherResults)
     meshVersion = meSHVersion(gatherResults)
 
-    computation(readyToCloseVirtuoso,app,
+    computation(readyToCloseVirtuoso,app,workflow,
     config_computation(meshVersion,pubchemVersion),
     config_enrichment_analysis(meshVersion,pubchemVersion))
 
     // 5 close virtuoso
-    shutdown_virtuoso(readyToCloseVirtuoso, app, data, docker_compose) 
+    shutdown_virtuoso(readyToCloseVirtuoso, workflow, data, docker_compose) 
 }

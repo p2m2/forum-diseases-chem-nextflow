@@ -110,3 +110,9 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 ```bash
 ./nextflow run forum-virtuoso.nf -entry forum_test_virtuoso -resume
 ```
+
+## Computation
+
+```bash
+./nextflow run forum-computation-cid-mesh.nf -entry forum_computation_cid_mesh
+```
