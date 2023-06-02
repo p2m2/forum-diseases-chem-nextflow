@@ -1,7 +1,8 @@
 include { app_forumScripts ; workflow_forumScripts } from './forum-source-repository'
 
-ncpu            = 1 //12
-memReq          = '1 GB'//'80 GB'
+ncpu            = 6
+memReq          = '80 GB'
+
 /* 
     Seulement 1 instance sur la machine.
     => Pas d'execution multiple sur la meme machine 
