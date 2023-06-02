@@ -150,7 +150,7 @@ workflow start_virtuoso() {
 
         // 2 disable checkpoint to improve performance
         readyToRequestVirtuoso = 
-            disabled_checkpoint(dockerCompose,data,ready,workflow)
+            disabled_checkpoint(ready,workflow,dockerCompose,data)
 
         // 3 test : request virtuoso
         test_virtuoso_request(readyToRequestVirtuoso)
