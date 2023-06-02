@@ -16,3 +16,4 @@ dependencies:
   - bs4
   - git
   - requests
+  - pandas
