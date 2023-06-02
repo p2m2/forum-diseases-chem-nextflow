@@ -16,6 +16,7 @@ process run_virtuoso {
     """
     echo "script to load:$listScriptSh"
     d=`pwd`
+    mkdir -p ${params.virtuosodir}
     pushd ${params.virtuosodir}
     \$d/$workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c start ${listScriptSh}
     popd
