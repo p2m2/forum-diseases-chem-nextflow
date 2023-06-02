@@ -3,8 +3,11 @@ include { run_virtuoso ;  disabled_checkpoint ; shutdown_virtuoso ; test_virtuos
 include { pubchemVersion } from './forum-PubChem-min'
 include { meSHVersion } from './forum-MeSH'
 
-ncpu = 12
-memReq = '80 GB'
+ncpu            = 12
+memReq          = '80 GB'
+uploadFile      = "upload_CID_MESH_EA.sh"
+resource        = "EnrichmentAnalysis/CID_MESH"
+nameComputation = "CID_MESH"
 
 process config_computation {
     publishDir "${params.configdir}/computation/CID_MESH/"
@@ -28,13 +31,13 @@ process config_computation {
                 https://forum.semantic-metabolomics.org/PubChem/reference/${pubchemVersion.trim()}
                 https://forum.semantic-metabolomics.org/MeSHRDF/${meshVersion.trim()}
     [X_Y]
-    name = CID_MESH
+    name = $nameComputation
     Request_name = count_distinct_pmids_by_CID_MESH
     Size_Request_name = count_number_of_CID
     limit_pack_ids = 500
     limit_selected_ids = 1000000
     n_processes = $ncpu
-    out_dir = CID_MESH
+    out_dir = $nameComputation
     [X]
     name = CID
     Request_name = count_distinct_pmids_by_CID
@@ -77,10 +80,10 @@ process config_enrichment_analysis {
     """
     tee -a config_CID_MESH.ini << END
     [DEFAULT]
-    upload_file = upload_CID_MESH_EA.sh
+    upload_file = $uploadFile
     ftp = ftp.semantic-metabolomics.org:/
     [METADATA]
-    ressource = EnrichmentAnalysis/CID_MESH
+    ressource = ${resource}
     targets = https://forum.semantic-metabolomics.org/MeSHRDF/${meshVersion.trim()}
             https://forum.semantic-metabolomics.org/PubChem/compound/${pubchemVersion.trim()}
     [PARSER]
@@ -111,32 +114,9 @@ process config_enrichment_analysis {
     """
 }
 
-process computation {
-    cpus ncpu
-    memory memReq
-    storeDir params.rdfoutdir
-    input:
-        val ready
-        path appDir
-        path workflowDir
-        path configComputation
-        path configEnrichmentAnalysis
-    output:
-        path "EnrichmentAnalysis/CID_MESH"
-        path "upload_CID_MESH_EA.sh"
 
-    """
-    $workflowDir/w_computation.sh -v ${params.forumRelease} \
-        -m $configComputation \
-        -t $configEnrichmentAnalysis \
-        -u CID_MESH \
-        -d  ${params.logdir} \
-        -s ${params.rdfoutdir} \
-        -l ${params.logdir} > computation_cid_mesh.log
-    """
-}
 
-workflow forum_computation_cid_mesh() {
+workflow computation_cid_mesh() {
 
     app = app_forumScripts()
     workflow = workflow_forumScripts()
@@ -151,34 +131,24 @@ workflow forum_computation_cid_mesh() {
     
     listScripts.view()
 
-    namesScripts = 
-    listScripts
-        .reduce { a,b -> 
-            a.split("/").last() + " " + b.split("/").last()
-            }
+    start_virtuoso(listScripts) 
 
-    gatherResults = waitProdDir(listScripts).collect()
-    run_virtuoso(gatherResults,workflow,namesScripts)
-
-    // 1 run virtuoso
-    readyToDisableCheckpoint = run_virtuoso.out[0]
-    data = run_virtuoso.out[1]
-    docker_compose = run_virtuoso.out[2]
+    readyToCompute = start_virtuoso.out[0]
+    dockerCompose  = start_virtuoso.out[1]
+    data           = start_virtuoso.out[2]
     
-    // 2 disable checkpoint to improve performance
-    readyToRequestVirtuoso = disabled_checkpoint(readyToDisableCheckpoint,workflow,data,docker_compose)
+    pubchemVersion=pubchemVersion(readyToCompute)
+    meshVersion = meSHVersion(readyToCompute)
 
-    // 3 request virtuoso
-    readyToCloseVirtuoso = test_virtuoso_request(readyToRequestVirtuoso)
+    readyToClose = computation(
+        readyToCompute,
+        app,
+        workflow,
+        resource,
+        uploadFile,
+        nameComputation,
+        config_computation(meshVersion,pubchemVersion),
+        config_enrichment_analysis(meshVersion))
 
-    // 4 computation
-    pubchemVersion=pubchemVersion(gatherResults)
-    meshVersion = meSHVersion(gatherResults)
-
-    computation(readyToCloseVirtuoso,app,workflow,
-    config_computation(meshVersion,pubchemVersion),
-    config_enrichment_analysis(meshVersion,pubchemVersion))
-
-    // 5 close virtuoso
-    shutdown_virtuoso(readyToCloseVirtuoso, workflow, data, docker_compose) 
+    stop_virtuoso(computation.out[0],workflow, dockerCompose, data)
 }

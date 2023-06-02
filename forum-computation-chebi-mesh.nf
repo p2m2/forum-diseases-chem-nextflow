@@ -132,7 +132,10 @@ workflow computation_chebi_mesh() {
     listScripts.view()
 
     start_virtuoso(listScripts) 
+
     readyToCompute = start_virtuoso.out[0]
+    dockerCompose  = start_virtuoso.out[1]
+    data           = start_virtuoso.out[2]
     
     pubchemVersion=pubchemVersion(readyToCompute)
     meshVersion = meSHVersion(readyToCompute)
@@ -148,5 +151,5 @@ workflow computation_chebi_mesh() {
         config_computation(meshVersion,pubchemVersion,chebiVersion),
         config_enrichment_analysis(meshVersion,chebiVersion))
 
-    stop_virtuoso(computation.out[0],workflow)
+    stop_virtuoso(computation.out[0],workflow, dockerCompose, data)
 }

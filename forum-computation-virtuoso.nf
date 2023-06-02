@@ -2,7 +2,10 @@ include { app_forumScripts ; workflow_forumScripts } from './forum-source-reposi
 
 ncpu            = 1 //12
 memReq          = '1 GB'//'80 GB'
-
+/* 
+    Seulement 1 instance sur la machine.
+    => Pas d'execution multiple sur la meme machine 
+*/
 process run_virtuoso {
     debug true
     input:
@@ -10,16 +13,14 @@ process run_virtuoso {
         path workflowDir
         val listScriptSh
     output:
+        path "docker-compose.yml"
+        path "data"
         val true
 
     /* -s <dir> dir should not be a symbolink link => ${params.rdfoutdir} is an absolute path */
     """
     echo "script to load:$listScriptSh"
-    d=`pwd`
-    mkdir -p ${params.virtuosodir}
-    pushd ${params.virtuosodir}
-    \$d/$workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c start ${listScriptSh}
-    popd
+    $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c start ${listScriptSh}
     """
 }
 
@@ -28,15 +29,14 @@ process disabled_checkpoint {
     input:
         val ready
         path workflowDir
+        path dockerCompose
+        path data
     
     output:
         val true 
 
     """
-    d=`pwd`
-    pushd ${params.virtuosodir}
-    \$d/$workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c fix
-    popd
+    $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c fix
     """
 }
 
@@ -77,13 +77,12 @@ process shutdown_virtuoso {
     input:
         val ready
         path workflowDir
+        path dockerCompose
+        path data
 
     """
-    d=`pwd`
-    pushd ${params.virtuosodir}
-    \$d/$workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c stop
-    \$d/$workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c clean
-    popd
+    $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c stop
+    $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c clean
     """
 }
 
@@ -140,29 +139,37 @@ workflow start_virtuoso() {
         
         namesScripts.view { "name script : $it "}
 
-        run_virtuoso(gatherResults,workflow,namesScripts)
-
         // 1 run virtuoso
-        ready = run_virtuoso.out[0]
+
+        run_virtuoso(gatherResults,workflow,namesScripts)
+        
+        dockerCompose = run_virtuoso.out[0]
+        data = run_virtuoso.out[1]
+        ready = run_virtuoso.out[2]
+
         // 2 disable checkpoint to improve performance
-        readyToRequestVirtuoso = disabled_checkpoint(
-            ready,workflow)
+        readyToRequestVirtuoso = 
+            disabled_checkpoint(dockerCompose,data,ready,workflow)
 
         // 3 test : request virtuoso
         test_virtuoso_request(readyToRequestVirtuoso)
 
     emit:
         test_virtuoso_request.out
+        dockerCompose
+        data
 }
 
 workflow stop_virtuoso() {
     take:
         readyToCloseVirtuoso
         workflow
+        dockerCompose
+        data
 
     main:
         app = app_forumScripts()
         workflow = workflow_forumScripts()
-        shutdown_virtuoso(readyToCloseVirtuoso, workflow)
+        shutdown_virtuoso(readyToCloseVirtuoso, workflow,dockerCompose,data)
 }
 
