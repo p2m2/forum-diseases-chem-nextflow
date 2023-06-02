@@ -174,3 +174,10 @@ workflow stop_virtuoso() {
         shutdown_virtuoso(readyToCloseVirtuoso, workflow,dockerCompose,data)
 }
 
+workflow.onError {
+
+    println "Oops... Pipeline execution stopped with the following message: ${workflow.errorMessage}"
+    def proc = "docker rm -f forum_virtuoso_9980".execute()
+    proc.waitFor()
+    println proc.text
+}
