@@ -6,7 +6,7 @@ include { chebiVersion } from './forum-vocabularies'
 
 ncpu            = 12
 memReq          = '80 GB'
-uploadFile      = "upload_CID_MESH_EA.sh"
+uploadFile      = "upload_CHEBI_MESH_EA.sh"
 resource        = "EnrichmentAnalysis/CHEBI_MESH"
 nameComputation = "CHEBI_MESH"
 
