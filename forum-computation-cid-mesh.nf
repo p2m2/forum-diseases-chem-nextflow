@@ -1,4 +1,4 @@
-include { app_forumScripts, workflow_forumScripts } from './forum-source-repository'
+include { app_forumScripts ; workflow_forumScripts } from './forum-source-repository'
 include { run_virtuoso ;  disabled_checkpoint ; shutdown_virtuoso ; test_virtuoso_request ; waitProdDir } from './forum-virtuoso'
 include { pubchemVersion } from './forum-PubChem-min'
 include { meSHVersion } from './forum-MeSH'
