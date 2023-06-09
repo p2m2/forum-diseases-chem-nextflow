@@ -2,20 +2,18 @@ include { app_forumScripts ; workflow_forumScripts } from './forum-source-reposi
 include { start_virtuoso ;  computation ; stop_virtuoso } from './forum-computation-virtuoso'
 include { pubchemVersion } from './forum-PubChem-min'
 include { meSHVersion } from './forum-MeSH'
-include { chemontVersion } from './forum-vocabularies'
 
-ncpu            = 12
-memReq          = '80 GB'
-uploadFile      = "upload_CHEMONT_MESH_EA.sh"
-resource        = "EnrichmentAnalysis/CHEMONT_MESH"
-nameComputation = "CHEMONT_MESH"
+ncpu            = 2
+memReq          = '40 GB'
+uploadFile      = "upload_MESH_MESH_EA.sh"
+resource        = "EnrichmentAnalysis/MESH_MESH"
+nameComputation = "MESH_MESH"
 
 process config_computation {
     publishDir "${params.configdir}/computation/$nameComputation/"
     input:
         val meshVersion
         val pubchemVersion
-        val chemontVersion
     output:
         path 'config.ini'
 
@@ -23,40 +21,37 @@ process config_computation {
     tee -a config.ini << END
     [DEFAULT]
     split = False
-    file_size = 30000
-    request_file = chemont_with_onto_mesh_with_onto
+    file_size = 100000
+    request_file = mesh_to_mesh
     [VIRTUOSO]
     url = http://localhost:9980/sparql/
-    graph_from = https://forum.semantic-metabolomics.org/PMID_CID/${params.forumRelease}
-                https://forum.semantic-metabolomics.org/PMID_CID_endpoints/${params.forumRelease}
+    graph_from = https://forum.semantic-metabolomics.org/PMID_CID_endpoints/${params.forumRelease}
                 https://forum.semantic-metabolomics.org/PubChem/reference/${pubchemVersion.trim()}
                 https://forum.semantic-metabolomics.org/MeSHRDF/${meshVersion.trim()}
-                https://forum.semantic-metabolomics.org/ClassyFire/direct-parent/${params.forumRelease}
-                https://forum.semantic-metabolomics.org/ChemOnt/${chemontVersion.trim()}
     [X_Y]
-    name = CHEMONT_MESH
-    Request_name = count_distinct_pmids_by_ChemOnt_MESH
-    Size_Request_name = count_number_of_ChemOnt
-    limit_pack_ids = 50
+    name = MESH_MESH
+    Request_name = count_distinct_pmids_by_MESH_MESH
+    Size_Request_name = count_number_of_MESH
+    limit_pack_ids = 10
     limit_selected_ids = 1000000
     n_processes = $ncpu
-    out_dir = CHEMONT_MESH
+    out_dir = MESH_MESH
     [X]
-    name = CHEMONT
-    Request_name = count_distinct_pmids_by_ChemOnt
-    Size_Request_name = count_number_of_ChemOnt
+    name = MESH1
+    Request_name = count_distinct_pmids_by_MESH
+    Size_Request_name = count_number_of_MESH
     limit_pack_ids = 50
     limit_selected_ids = 51
     n_processes = $ncpu
-    out_dir = CHEMONT_PMID
+    out_dir = MESH1
     [Y]
-    name = MESH
+    name = MESH2
     Request_name = count_distinct_pmids_by_MESH
     Size_Request_name = count_number_of_MESH
-    limit_pack_ids = 250
-    limit_selected_ids = 251
+    limit_pack_ids = 50
+    limit_selected_ids = 51
     n_processes = $ncpu
-    out_dir = MESH_PMID
+    out_dir = MESH2
     [U]
     name = PMID
     Request_name = count_all_individuals
@@ -74,49 +69,46 @@ process config_enrichment_analysis {
     publishDir "${params.configdir}/enrichment_analysis/"
     input:
         val meshVersion
-        val chemontVersion
     output:
-        path 'config_CHEMONT_MESH.ini'
+        path 'config_MESH_MESH.ini'
     
 
     """
-    tee -a config_CHEMONT_MESH.ini << END
+    tee -a config_MESH_MESH.ini << END
     [DEFAULT]
     upload_file = $uploadFile
     ftp = ftp.semantic-metabolomics.org:/
     [METADATA]
     ressource = $resource
     targets = https://forum.semantic-metabolomics.org/MeSHRDF/${meshVersion.trim()}
-            https://forum.semantic-metabolomics.org/ChemOnt/${chemontVersion.trim()}
+            https://forum.semantic-metabolomics.org/MeSHRDF/${meshVersion.trim()}
     [PARSER]
     chunk_size = 1000000
     threshold = 0.000001
     column = q.value
     [NAMESPACE]
-    ns = http://purl.obolibrary.org/obo/
-        http://id.nlm.nih.gov/mesh/
+    ns = http://id.nlm.nih.gov/mesh/
         http://www.w3.org/2004/02/skos/core#
-    name = obo
-        mesh
+    name = mesh
         skos
     [SUBJECTS]
-    name = CHEMONT
-    namespace = obo
+    name = MESH1
+    namespace = mesh
     prefix = 
     [PREDICATES]
     name = related
     namespace = skos 
     [OBJECTS]
-    name = MESH
+    name = MESH2
     namespace = mesh
     prefix =
     [OUT]
-    file_prefix = triples_assos_CHEMONT_MESH
+    file_prefix = triples_assos_MESH_MESH
     END
     """
 }
 
-workflow computation_chemont_mesh() {
+workflow computation_mesh_mesh() {
 
     app = app_forumScripts()
     workflow = workflow_forumScripts()
@@ -126,8 +118,7 @@ workflow computation_chemont_mesh() {
         "${params.rdfoutdir}/upload.sh",
         "${params.rdfoutdir}/upload_PMID_CID.sh",
         "${params.rdfoutdir}/upload_MeSH.sh",
-        "${params.rdfoutdir}/upload_PubChem_minimal.sh",
-        "${params.rdfoutdir}/upload_Chemont.sh"
+        "${params.rdfoutdir}/upload_PubChem_minimal.sh"
     ])
     
     listScripts.view()
@@ -140,7 +131,6 @@ workflow computation_chemont_mesh() {
     
     pubchemVersion=pubchemVersion(readyToCompute)
     meshVersion = meSHVersion(readyToCompute)
-    chemontVersion = chemontVersion()
 
     readyToClose = computation(
         readyToCompute,
@@ -149,8 +139,8 @@ workflow computation_chemont_mesh() {
         resource,
         uploadFile,
         nameComputation,
-        config_computation(meshVersion,pubchemVersion,chemontVersion),
-        config_enrichment_analysis(meshVersion,chemontVersion))
+        config_computation(meshVersion,pubchemVersion),
+        config_enrichment_analysis(meshVersion))
 
     stop_virtuoso(computation.out[0],workflow, dockerCompose, data)
 }
