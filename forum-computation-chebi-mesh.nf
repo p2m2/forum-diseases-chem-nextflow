@@ -11,7 +11,7 @@ resource        = "EnrichmentAnalysis/CHEBI_MESH"
 nameComputation = "CHEBI_MESH"
 
 process config_computation {
-    publishDir "${params.configdir}/computation/CID_MESH/"
+    publishDir "${params.configdir}/computation/$nameComputation/"
     input:
         val meshVersion
         val pubchemVersion
