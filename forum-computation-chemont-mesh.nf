@@ -116,7 +116,7 @@ process config_enrichment_analysis {
     """
 }
 
-workflow computation_chebi_mesh() {
+workflow computation_chemont_mesh() {
 
     app = app_forumScripts()
     workflow = workflow_forumScripts()
