@@ -13,8 +13,8 @@ nameComputation = "CHEBI_MESH"
 process config_computation {
     publishDir "${params.configdir}/computation/CID_MESH/"
     input:
-        val pubchemVersion
         val meshVersion
+        val pubchemVersion
         val chebiVersion
     output:
         path 'config.ini'

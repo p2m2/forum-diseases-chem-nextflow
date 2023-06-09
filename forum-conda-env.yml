@@ -8,6 +8,10 @@ dependencies:
   - python=3.10
   - r-base
   - r-essentials
+  - r-optparse
+  - r-bigstatsr
+  - r-r.utils
+  - r-readr
   - rdflib
   - python-dateutil
   - entrez-direct
