@@ -111,6 +111,35 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 ./nextflow run forum-computation-virtuoso.nf -entry test_virtuoso -resume
 ```
 
+## Virtuoso
+
+### workflow to load a virtuoso database
+
+create a file `start_virtuoso.nf`
+
+```rb
+include { start_virtuoso } from './forum-computation-virtuoso'
+
+workflow load() {
+
+listScripts = Channel.fromList([
+        "${params.rdfoutdir}/upload.sh",
+        "${params.rdfoutdir}/upload_PMID_CID.sh",
+        "${params.rdfoutdir}/upload_MeSH.sh",
+        "${params.rdfoutdir}/upload_PubChem_minimal.sh"
+    ])
+    
+listScripts.view()
+
+start_virtuoso(listScripts) 
+}
+```
+### run 
+
+```bash
+./nextflow run start_virtuoso.nf -entry load
+```
+
 ## Computation
 
 ### docker command

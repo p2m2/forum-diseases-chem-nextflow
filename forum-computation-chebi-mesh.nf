@@ -153,3 +153,26 @@ workflow computation_chebi_mesh() {
 
     stop_virtuoso(computation.out[0],workflow, dockerCompose, data)
 }
+
+/* Testing method with virtuoso already online on the server */
+workflow computation_chebi_mesh_test() {
+    
+    app = app_forumScripts()
+    workflow = workflow_forumScripts()
+
+    readyToCompute = Channel.from(true)
+
+    pubchemVersion=pubchemVersion(readyToCompute)
+    meshVersion = meSHVersion(readyToCompute)
+    chebiVersion = chebiVersion()
+
+    readyToClose = computation(
+        readyToCompute,
+        app,
+        workflow,
+        resource,
+        uploadFile,
+        nameComputation,
+        config_computation(meshVersion,pubchemVersion,chebiVersion),
+        config_enrichment_analysis(meshVersion,chebiVersion))
+}
