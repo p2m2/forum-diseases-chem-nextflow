@@ -1,7 +1,7 @@
 include { app_forumScripts ; workflow_forumScripts } from './forum-source-repository'
 
 ncpu            = 6
-memReq          = '80 GB'
+memReq          = '256 GB'
 
 /* 
     Seulement 1 instance sur la machine.
@@ -9,6 +9,7 @@ memReq          = '80 GB'
 */
 process run_virtuoso {
     debug true
+    memory memReq
     input:
         val ready
         path workflowDir
