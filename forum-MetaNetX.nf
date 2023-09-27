@@ -3,7 +3,7 @@ include { app_forumScripts } from './forum-source-repository'
 
 process metaNetXVersion {
     output:
-        stdout 
+        stdout emit: value
     maxRetries 3
     
     script:
@@ -16,7 +16,7 @@ process config_import_MetaNetX {
     //memory '40 GB'
     publishDir params.configdir
     input:
-        val metaNetXVersion
+        val version
     output:
         path 'import_MetaNetX.ini'
 
@@ -26,7 +26,7 @@ process config_import_MetaNetX {
     upload_file = upload_MetaNetX.sh
     log_file = dl_metanetx.log
     [METANETX]
-    version = ${metaNetXVersion.trim()}
+    version = ${version}
     url = https://www.metanetx.org/ftp/{version}/metanetx.ttl.gz
     END
     """
@@ -56,7 +56,7 @@ process config_import_MetaNetX_mapping {
     publishDir params.configdir
     input:
         val ready
-        val metaNetXVersion
+        val version
     output:
         path 'import_MetaNetX_mapping.ini'
 
@@ -65,7 +65,7 @@ process config_import_MetaNetX_mapping {
     [DEFAULT]
     upload_file = upload_MetaNetX_mapping.sh
     [METANETX]
-    version = ${metaNetXVersion.trim()}
+    version = ${version}
     file_name = metanetx.ttl.gz
     [META]
     path = app/build/data/table_info_2021.csv
@@ -110,8 +110,8 @@ process waitMetaNetX {
 
 workflow forum_MetaNetX() {
     app=app_forumScripts()
-    version=metaNetXVersion()
-    config_import_MetaNetX(version).combine(app) | build_import_MetaNetX
+    metanetxVersion=metaNetXVersion()
+    config_import_MetaNetX(metanetxVersion.value).combine(app) | build_import_MetaNetX
     waitMetaNetX(build_import_MetaNetX.out[0])
-    config_import_MetaNetX_mapping(version,waitMetaNetX.out).combine(app).combine(build_import_MetaNetX.out[0]) | build_import_MetaNetX_mapping
+    config_import_MetaNetX_mapping(waitMetaNetX.out,metanetxVersion.value).combine(app).combine(build_import_MetaNetX.out[0]) | build_import_MetaNetX_mapping
 }
