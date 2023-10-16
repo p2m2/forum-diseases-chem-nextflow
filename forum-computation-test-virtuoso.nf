@@ -30,7 +30,7 @@ workflow test_upload_vocab() {
     data           = start_virtuoso.out[2]
 
     //test_virtuoso_request(readyToCompute.out[0])
-    readyToClose = test_virtuoso_request.out[0]
+    //readyToClose = test_virtuoso_request.out[0]
 
     stop_virtuoso(readyToCompute,workflow, dockerCompose, data)
 
