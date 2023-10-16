@@ -27,6 +27,7 @@ process run_virtuoso {
 }
 
 process test_virtuoso_request {
+    conda 'curl'
     input:
         val ready
     output:

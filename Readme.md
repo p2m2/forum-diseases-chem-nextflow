@@ -5,7 +5,8 @@ The workflow was built from the [manual](https://gist.github.com/ofilangi/9c026c
 ## pre-requisites
 
 - [docker](https://docs.docker.com/engine/install/)
-- conda 
+- conda
+- bc 
 
 ## Configuration
 
@@ -122,42 +123,13 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 
 ## Computation
 
-### testnn
+### test
 
 ```bash
 # if the vocabularies workflow is not built.
 ./nextflow run forum-vocabularies.nf -entry forum_vocabularies
 # and then...
 ./nextflow run forum-computation-test-virtuoso.nf -entry test_upload_vocab -c nextflow-test.config
-```
-
-## Virtuoso
-
-### workflow to load a virtuoso database
-
-create a file `start_virtuoso.nf`
-
-```rb
-include { start_virtuoso } from './forum-computation-virtuoso'
-
-workflow load() {
-
-listScripts = Channel.fromList([
-        "${params.rdfoutdir}/upload.sh",
-        "${params.rdfoutdir}/upload_PMID_CID.sh",
-        "${params.rdfoutdir}/upload_MeSH.sh",
-        "${params.rdfoutdir}/upload_PubChem_minimal.sh"
-    ])
-    
-listScripts.view()
-
-start_virtuoso(listScripts) 
-}
-```
-### run 
-
-```bash
-./nextflow run start_virtuoso.nf -entry load
 ```
 
 ## Computation
