@@ -4,7 +4,7 @@ The workflow was built from the [manual](https://gist.github.com/ofilangi/9c026c
 
 ## pre-requisites
 
-- [docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+- [docker](https://docs.docker.com/engine/install/)
 - conda 
 
 ## Configuration
@@ -120,12 +120,14 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 #### TODO
 - tweak forum_Chemont
 
-## Testing Computation
+## Computation
+
+### testnn
 
 ```bash
 # if vocabularies workflow is not builded.
 ./nextflow run forum-vocabularies.nf -entry forum_vocabularies
-./nextflow run forum-computation-test-virtuoso.nf -entry test_upload_vocab -c test-env.config
+./nextflow run forum-computation-test-virtuoso.nf -entry test_upload_vocab -c nextflow-test.config
 ```
 
 ## Virtuoso

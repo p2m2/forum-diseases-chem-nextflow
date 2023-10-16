@@ -1,7 +1,7 @@
 include { app_forumScripts ; workflow_forumScripts } from './forum-source-repository'
 
-ncpu            = ncpuVirtuoso
-memReq          = memReqVirtuoso
+ncpu            = params.ncpuVirtuoso
+memReq          = params.memReqVirtuoso
 
 /* 
     Seulement 1 instance sur la machine.
