@@ -1,5 +1,5 @@
 include { app_forumScripts ; workflow_forumScripts } from './forum-source-repository'
-include { run_virtuoso ;  disabled_checkpoint ; shutdown_virtuoso ; test_virtuoso_request ; waitProdDir } from './forum-computation-virtuoso'
+include { start_virtuoso ;  computation ; stop_virtuoso } from './forum-computation-virtuoso'
 include { pubchemVersion } from './forum-PubChem-min'
 include { meSHVersion } from './forum-MeSH'
 
@@ -148,7 +148,7 @@ workflow computation_cid_mesh() {
         uploadFile,
         nameComputation,
         config_computation(meshVersion,pubchemVersion),
-        config_enrichment_analysis(meshVersion))
+        config_enrichment_analysis(meshVersion,pubchemVersion))
 
     stop_virtuoso(computation.out[0],workflow, dockerCompose, data)
 }
