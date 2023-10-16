@@ -1,6 +1,20 @@
-include { start_virtuoso ; test_virtuoso_request } from './forum-computation-virtuoso'
+include { start_virtuoso ; stop_virtuoso } from './forum-computation-virtuoso'
+
+process test_virtuoso_request {
+    debug true
+    input:
+        val ready
+    output:
+        val true // finnished!
+
+    """
+    curl -H "Accept: application/json" -G http://localhost:9980/sparql --data-urlencode query='select distinct ?type where { ?thing a ?type } limit 1'
+    """
+}
 
 workflow test_upload_vocab() {
+
+    app = app_forumScripts()
 
     listScripts = Channel.fromList([
             "${params.rdfoutdir}/upload.sh"

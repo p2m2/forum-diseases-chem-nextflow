@@ -125,8 +125,9 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 ### testnn
 
 ```bash
-# if vocabularies workflow is not builded.
+# if the vocabularies workflow is not built.
 ./nextflow run forum-vocabularies.nf -entry forum_vocabularies
+# and then...
 ./nextflow run forum-computation-test-virtuoso.nf -entry test_upload_vocab -c nextflow-test.config
 ```
 

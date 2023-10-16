@@ -88,19 +88,6 @@ process shutdown_virtuoso {
     """
 }
 
-
-process test_virtuoso_request {
-    debug true
-    input:
-        val ready
-    output:
-        val true // finnished!
-
-    """
-    curl -H "Accept: application/json" -G http://localhost:9980/sparql --data-urlencode query='select distinct ?type where { ?thing a ?type } limit 1'
-    """
-}
-
 process waitProdDir {
     debug true
     input:
