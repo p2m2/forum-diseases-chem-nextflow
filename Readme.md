@@ -71,43 +71,43 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 #### Vocabularies
 
 ```bash
-./nextflow run forum-vocabularies.nf -entry forum_vocabularies -resume
+./nextflow run forum-vocabularies.nf -entry forum_vocabularies -bg
 ```
 
 #### MeSH
 
 ```bash
-./nextflow run forum-MeSH.nf -entry forum_mesh
+./nextflow run forum-MeSH.nf -entry forum_mesh -bg
 ```
 
 #### MetaNetX
 
 ```bash
-./nextflow run forum-MetaNetX.nf -entry forum_MetaNetX
+./nextflow run forum-MetaNetX.nf -entry forum_MetaNetX -bg
 ```
 
 #### PubChem min
 
 ```bash
-./nextflow run forum-PubChem-min.nf -entry forum_PubChemMin
+./nextflow run forum-PubChem-min.nf -entry forum_PubChemMin -bg
 ```
 
 #### PMID-CID
 
 ```bash
-./nextflow run forum-PMID-CID.nf -entry forum_PMID_CID
+./nextflow run forum-PMID-CID.nf -entry forum_PMID_CID -bg
 ```
 
 #### SBML Human
 
 ```bash
-./nextflow run forum-SBML_Human.nf -entry forum_SBML_Human
+./nextflow run forum-SBML_Human.nf -entry forum_SBML_Human -bg
 ```
 
 #### SBML Chemont
 
 ```bash
-./nextflow run forum-chemont.nf -entry forum_Chemont
+./nextflow run forum-chemont.nf -entry forum_Chemont -bg
 ```
 
 #### History
@@ -125,7 +125,7 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 ```bash
 # if vocabularies workflow is not builded.
 ./nextflow run forum-vocabularies.nf -entry forum_vocabularies
-./nextflow run forum-computation-test-virtuoso.nf -entry test_upload_vocab
+./nextflow run forum-computation-test-virtuoso.nf -entry test_upload_vocab -c test-env.config
 ```
 
 ## Virtuoso

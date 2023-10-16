@@ -1,14 +1,14 @@
 include { app_forumScripts ; workflow_forumScripts } from './forum-source-repository'
 
-//ncpu            = 6
-//memReq          = '234 GB'
+ncpu            = ncpuVirtuoso
+memReq          = memReqVirtuoso
 
 /* 
     Seulement 1 instance sur la machine.
     => Pas d'execution multiple sur la meme machine 
 */
 process run_virtuoso {
-    debug true
+//    debug true
     memory memReq
     input:
         val ready
@@ -27,7 +27,7 @@ process run_virtuoso {
 }
 
 process disabled_checkpoint {
-    debug true
+//    debug true
     input:
         val ready
         path workflowDir
