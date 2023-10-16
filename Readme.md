@@ -2,6 +2,11 @@
 
 The workflow was built from the [manual](https://gist.github.com/ofilangi/9c026c7f1b9ff3b38de3ee6153f15326) construction notes of [FORUM](https://github.com/eMetaboHUB/Forum-DiseasesChem/)
 
+## pre-requisites
+
+- [docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+- conda 
+
 ## Configuration
 
 ``nextflow.config
@@ -69,41 +74,51 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 ./nextflow run forum-vocabularies.nf -entry forum_vocabularies -resume
 ```
 
-#### MeSH
+#### MeSH
 
 ```bash
-./nextflow run forum-MeSH.nf -entry forum_mesh -resume
+./nextflow run forum-MeSH.nf -entry forum_mesh
 ```
 
 #### MetaNetX
 
 ```bash
-./nextflow run forum-MetaNetX.nf -entry forum_MetaNetX -resume
+./nextflow run forum-MetaNetX.nf -entry forum_MetaNetX
 ```
 
 #### PubChem min
 
 ```bash
-./nextflow run forum-PubChem-min.nf -entry forum_PubChemMin -resume
+./nextflow run forum-PubChem-min.nf -entry forum_PubChemMin
 ```
 
 #### PMID-CID
 
 ```bash
-./nextflow run forum-PMID-CID.nf -entry forum_PMID_CID -resume
+./nextflow run forum-PMID-CID.nf -entry forum_PMID_CID
 ```
 
 #### SBML Human
 
 ```bash
-./nextflow run forum-SBML_Human.nf -entry forum_SBML_Human -resume
+./nextflow run forum-SBML_Human.nf -entry forum_SBML_Human
 ```
 
 #### SBML Chemont
 
 ```bash
-./nextflow run forum-chemont.nf -entry forum_Chemont -resume
+./nextflow run forum-chemont.nf -entry forum_Chemont
 ```
+
+#### History
+
+##### 27/09/2023 
+
+- 3d 17h 41m 56s	nextflow run forum-PMID-CID.nf -entry forum_PMID_CID              
+- 14d 5h 58m 56s nextflow run forum-chemont.nf -entry forum_Chemont 
+
+#### TODO
+- tweak forum_Chemont
 
 ## Testing Computation
 

@@ -1,7 +1,7 @@
 include { app_forumScripts ; workflow_forumScripts } from './forum-source-repository'
 
-ncpu            = 6
-memReq          = '256 GB'
+//ncpu            = 6
+//memReq          = '234 GB'
 
 /* 
     Seulement 1 instance sur la machine.
