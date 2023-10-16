@@ -2,6 +2,12 @@
 
 The workflow was built from the [manual](https://gist.github.com/ofilangi/9c026c7f1b9ff3b38de3ee6153f15326) construction notes of [FORUM](https://github.com/eMetaboHUB/Forum-DiseasesChem/)
 
+## pre-requisites
+
+- [docker](https://docs.docker.com/engine/install/)
+- conda
+- bc 
+
 ## Configuration
 
 ``nextflow.config
@@ -66,78 +72,64 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 #### Vocabularies
 
 ```bash
-./nextflow run forum-vocabularies.nf -entry forum_vocabularies -resume
+./nextflow run forum-vocabularies.nf -entry forum_vocabularies -bg
 ```
 
-#### MeSH
+#### MeSH
 
 ```bash
-./nextflow run forum-MeSH.nf -entry forum_mesh -resume
+./nextflow run forum-MeSH.nf -entry forum_mesh -bg
 ```
 
 #### MetaNetX
 
 ```bash
-./nextflow run forum-MetaNetX.nf -entry forum_MetaNetX -resume
+./nextflow run forum-MetaNetX.nf -entry forum_MetaNetX -bg
 ```
 
 #### PubChem min
 
 ```bash
-./nextflow run forum-PubChem-min.nf -entry forum_PubChemMin -resume
+./nextflow run forum-PubChem-min.nf -entry forum_PubChemMin -bg
 ```
 
 #### PMID-CID
 
 ```bash
-./nextflow run forum-PMID-CID.nf -entry forum_PMID_CID -resume
+./nextflow run forum-PMID-CID.nf -entry forum_PMID_CID -bg
 ```
 
 #### SBML Human
 
 ```bash
-./nextflow run forum-SBML_Human.nf -entry forum_SBML_Human -resume
+./nextflow run forum-SBML_Human.nf -entry forum_SBML_Human -bg
 ```
 
 #### SBML Chemont
 
 ```bash
-./nextflow run forum-chemont.nf -entry forum_Chemont -resume
+./nextflow run forum-chemont.nf -entry forum_Chemont -bg
 ```
 
-## Testing Computation
+#### History
+
+##### 27/09/2023 
+
+- 3d 17h 41m 56s	nextflow run forum-PMID-CID.nf -entry forum_PMID_CID              
+- 14d 5h 58m 56s nextflow run forum-chemont.nf -entry forum_Chemont 
+
+#### TODO
+- tweak forum_Chemont
+
+## Computation
+
+### test
 
 ```bash
-./nextflow run forum-computation-virtuoso.nf -entry test_virtuoso -resume
-```
-
-## Virtuoso
-
-### workflow to load a virtuoso database
-
-create a file `start_virtuoso.nf`
-
-```rb
-include { start_virtuoso } from './forum-computation-virtuoso'
-
-workflow load() {
-
-listScripts = Channel.fromList([
-        "${params.rdfoutdir}/upload.sh",
-        "${params.rdfoutdir}/upload_PMID_CID.sh",
-        "${params.rdfoutdir}/upload_MeSH.sh",
-        "${params.rdfoutdir}/upload_PubChem_minimal.sh"
-    ])
-    
-listScripts.view()
-
-start_virtuoso(listScripts) 
-}
-```
-### run 
-
-```bash
-./nextflow run start_virtuoso.nf -entry load
+# if the vocabularies workflow is not built.
+./nextflow run forum-vocabularies.nf -entry forum_vocabularies
+# and then...
+./nextflow run forum-computation-test-virtuoso.nf -entry test_upload_vocab -c nextflow-test.config
 ```
 
 ## Computation

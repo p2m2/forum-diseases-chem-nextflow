@@ -1,14 +1,14 @@
 include { app_forumScripts ; workflow_forumScripts } from './forum-source-repository'
 
-ncpu            = 6
-memReq          = '256 GB'
+ncpu            = params.ncpuVirtuoso
+memReq          = params.memReqVirtuoso
 
 /* 
     Seulement 1 instance sur la machine.
     => Pas d'execution multiple sur la meme machine 
 */
 process run_virtuoso {
-    debug true
+//    debug true
     memory memReq
     input:
         val ready
@@ -26,8 +26,20 @@ process run_virtuoso {
     """
 }
 
+process test_virtuoso_request {
+    conda 'curl'
+    input:
+        val ready
+    output:
+        val true // finished!
+
+    """
+    curl -H "Accept: application/json" -G http://localhost:9980/sparql --data-urlencode query='select distinct ?type where { ?thing a ?type } limit 1'
+    """
+}
+
 process disabled_checkpoint {
-    debug true
+//    debug true
     input:
         val ready
         path workflowDir
@@ -85,19 +97,6 @@ process shutdown_virtuoso {
     """
     $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c stop
     $workflowDir/w_virtuoso.sh -d . -s ${params.rdfoutdir} -c clean
-    """
-}
-
-
-process test_virtuoso_request {
-    debug true
-    input:
-        val ready
-    output:
-        val true // finnished!
-
-    """
-    curl -H "Accept: application/json" -G http://localhost:9980/sparql --data-urlencode query='select distinct ?type where { ?thing a ?type } limit 1'
     """
 }
 
