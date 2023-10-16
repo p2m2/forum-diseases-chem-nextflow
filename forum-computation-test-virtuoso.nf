@@ -1,6 +1,6 @@
 include { start_virtuoso } from './forum-computation-virtuoso'
 
-workflow load() {
+workflow test_upload_vocab() {
 
     listScripts = Channel.fromList([
             "${params.rdfoutdir}/upload.sh"
