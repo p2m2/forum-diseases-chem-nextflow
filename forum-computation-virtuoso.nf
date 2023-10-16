@@ -26,6 +26,17 @@ process run_virtuoso {
     """
 }
 
+process test_virtuoso_request {
+    input:
+        val ready
+    output:
+        val true // finished!
+
+    """
+    curl -H "Accept: application/json" -G http://localhost:9980/sparql --data-urlencode query='select distinct ?type where { ?thing a ?type } limit 1'
+    """
+}
+
 process disabled_checkpoint {
 //    debug true
     input:
