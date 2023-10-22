@@ -79,7 +79,7 @@ process computation {
         -m $configComputation \
         -t $configEnrichmentAnalysis \
         -u $nameComputation \
-        -d ${params.logdir} \
+        -d ${params.outdir} \
         -s ${params.rdfoutdir} \
         -l ${params.logdir}
     """
