@@ -59,6 +59,7 @@ process computation {
     cpus ncpu
     memory memReq
     storeDir params.rdfoutdir
+    storeDir params.outdir
 
     input:
         val ready
