@@ -2,13 +2,37 @@ include { app_forumScripts ; workflow_forumScripts } from './forum-source-reposi
 include { start_virtuoso ;  computation ; stop_virtuoso } from './forum-computation-virtuoso'
 include { pubchemVersion } from './forum-PubChem-min'
 include { meSHVersion } from './forum-MeSH'
-include { chemontVersion } from './forum-vocabularies'
 
 ncpu            = 12
 memReq          = '80 GB'
 uploadFile      = "upload_CHEMONT_MESH_EA.sh"
 resource        = "EnrichmentAnalysis/CHEMONT_MESH"
 nameComputation = "CHEMONT_MESH"
+
+process waitChemOnt {
+    output: 
+        val true
+    
+    """
+    echo "==== Waiting for upload.sh ===="
+    while [ ! -e ${params.rdfoutdir}/upload.sh  ]
+    do 
+        sleep 1
+    done
+    """
+}
+
+/* val ready : waiting for results of waitPubChem process */
+process chemontVersion {
+    input:
+        val ready
+    output: stdout
+    
+    shell:
+    """
+    cat ${params.rdfoutdir}/upload.sh |  grep ChemOnt | head -n1 | grep -Po '\\d+-\\d+-\\d+' 
+    """
+}
 
 process config_computation {
     publishDir "${params.configdir}/computation/$nameComputation/"
@@ -140,7 +164,9 @@ workflow computation_chemont_mesh() {
     
     pubchemVersion=pubchemVersion(readyToCompute)
     meshVersion = meSHVersion(readyToCompute)
-    chemontVersion = chemontVersion()
+
+    waitChemOnt()
+    chemontVersion = chemontVersion(waitChemOnt.out)
 
     readyToClose = computation(
         readyToCompute,
