@@ -27,8 +27,10 @@ process chebiVersion {
     input:
         val ready
     output: stdout
+    
+    shell:
     """
-    cat ${params.rdfoutdir}/upload.sh |  grep ChEBI | head -n1 | grep -Po '\d+-\d+-\d+' 
+    cat ${params.rdfoutdir}/upload.sh |  grep ChEBI | head -n1 | grep -Po '\\d+-\\d+-\\d+' 
     """
 }
 
@@ -161,7 +163,8 @@ workflow computation_chebi_mesh() {
     
     pubchemVersion=pubchemVersion(readyToCompute)
     meshVersion = meSHVersion(readyToCompute)
-    chebiVersion = chebiVersion()
+    waitChEBI()
+    chebiVersion = chebiVersion(waitChEBI.out)
 
     readyToClose = computation(
         readyToCompute,
