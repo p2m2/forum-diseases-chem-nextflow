@@ -2,13 +2,35 @@ include { app_forumScripts ; workflow_forumScripts } from './forum-source-reposi
 include { start_virtuoso ;  computation ; stop_virtuoso } from './forum-computation-virtuoso'
 include { pubchemVersion } from './forum-PubChem-min'
 include { meSHVersion } from './forum-MeSH'
-include { chebiVersion } from './forum-vocabularies'
 
 ncpu            = 12
 memReq          = '80 GB'
 uploadFile      = "upload_CHEBI_MESH_EA.sh"
 resource        = "EnrichmentAnalysis/CHEBI_MESH"
 nameComputation = "CHEBI_MESH"
+
+process waitChEBI {
+    output: 
+        val true
+    
+    """
+    echo "==== Waiting for upload.sh ===="
+    while [ ! -e ${params.rdfoutdir}/upload.sh  ]
+    do 
+        sleep 1
+    done
+    """
+}
+
+/* val ready : waiting for results of waitPubChem process */
+process chebiVersion {
+    input:
+        val ready
+    output: stdout
+    """
+    cat ${params.rdfoutdir}/upload.sh |  grep ChEBI | head -n1 | grep -Po '\d+-\d+-\d+' 
+    """
+}
 
 process config_computation {
     publishDir "${params.configdir}/computation/$nameComputation/"
@@ -164,7 +186,8 @@ workflow computation_chebi_mesh_test() {
 
     pubchemVersion=pubchemVersion(readyToCompute)
     meshVersion = meSHVersion(readyToCompute)
-    chebiVersion = chebiVersion()
+    waitChEBI()
+    chebiVersion = chebiVersion(waitChEBI.out)
 
     readyToClose = computation(
         readyToCompute,
