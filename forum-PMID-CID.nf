@@ -81,13 +81,14 @@ workflow forum_PMID_CID() {
     compound = Channel.fromPath("${params.rdfoutdir}/PubChem_Compound")
     reference = Channel.fromPath("${params.rdfoutdir}/PubChem_Reference")
     
-    versionPubChem = waitPubChem()
+    pubChem = waitPubChem()
+    versionPubChem = pubchemVersion(pubChem)
     app = app_forumScripts()
 
     get_pmid_identifiers_list(versionPubChem.combine(app).combine(reference))
 
     config_import_PMIDCID(
-        pubchemVersion(versionPubChem))
+        versionPubChem)
         .combine(app)
         .combine(compound) 
         .combine(reference) 
