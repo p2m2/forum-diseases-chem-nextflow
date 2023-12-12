@@ -62,7 +62,7 @@ process build_import_PMIDCID {
         pubChemCompound and pubChemReference must be as input to reach turtle files by the import_PMID_CID.py process
     */
     input:
-        tuple path(import_PMID_CID), path(app), path(pubChemCompound), path(pubChemReference)
+        tuple path(import_PMID_CID), path(list_pmids_identifiers), path(app), path(pubChemCompound), path(pubChemReference)
     output:
         path "PMID_CID"
         path "PMID_CID_endpoints"
@@ -90,6 +90,7 @@ workflow forum_PMID_CID() {
     list_pmidd_identifiers = get_pmid_identifiers_list(versionPubChem.combine(app).combine(reference))
 
     config_import_PMIDCID(versionPubChem,list_pmidd_identifiers)
+        .combine(list_pmidd_identifiers)
         .combine(app)
         .combine(compound) 
         .combine(reference) 
