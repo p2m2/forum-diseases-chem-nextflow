@@ -2,17 +2,15 @@ include { app_forumScripts } from './forum-source-repository'
 include { pubchemVersion ; waitPubChem } from './forum-PubChem-min'
 
 process get_pmid_identifiers_list {
-    memory '40 GB'
-    conda 'curl openjdk'
+    memory '6 GB'
+    conda 'nodejs'
     input:
         tuple val(pubchemVersion), path(app),path(pubChemReference)
     
     output:
         path 'list_pmids_identifiers.tsv'
     """
-    curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.5.11/2.13-2.5.11 > amm
-    chmod +x amm
-    ./amm $app/build/pmid_to_identifier.sc list_pmids_identifiers.tsv PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz
+    node $app/build/pmid_to_identifier.js PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz > list_pmids_identifiers.tsv
     """
 }
 
@@ -21,6 +19,7 @@ process config_import_PMIDCID {
 
     input:
         val pubchemVersion
+        path list_pmids_identifiers
 
     output:
         path 'import_PMID_CID.ini'
@@ -30,6 +29,7 @@ process config_import_PMIDCID {
     [DEFAULT]
     upload_file = upload_PMID_CID.sh
     log_file = log_PMID_CID.log
+    SOME_MAXIME = ${list_pmids_identifiers}
     [ELINK]
     version = ${params.forumRelease}
     run_as_test = ${params.entrez.run_as_test}
@@ -85,10 +85,9 @@ workflow forum_PMID_CID() {
     versionPubChem = pubchemVersion(pubChem)
     app = app_forumScripts()
 
-    get_pmid_identifiers_list(versionPubChem.combine(app).combine(reference))
+    list_pmidd_identifiers = get_pmid_identifiers_list(versionPubChem.combine(app).combine(reference))
 
-    config_import_PMIDCID(
-        versionPubChem)
+    config_import_PMIDCID(versionPubChem,list_pmidd_identifiers)
         .combine(app)
         .combine(compound) 
         .combine(reference) 
