@@ -11,7 +11,8 @@ process get_pmid_identifiers_list {
         path 'list_pmids_identifiers.tsv'
     """
     npm install n3
-    node $app/build/pmid_to_identifier.js PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz > list_pmids_identifiers.tsv
+    cp $app/build/pmid_to_identifier.js .
+    node pmid_to_identifier.js PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz > list_pmids_identifiers.tsv
     """
 }
 
