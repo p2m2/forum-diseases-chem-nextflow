@@ -12,7 +12,7 @@ process get_pmid_identifiers_list {
     """
     curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/2.5.11/2.13-2.5.11 > amm
     chmod +x amm
-    ./amm $app/build/import_PMID_CID.py list_pmids_identifiers.tsv PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz
+    ./amm $app/build/pmid_to_identifier.sc list_pmids_identifiers.tsv PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz
     """
 }
 
