@@ -8,7 +8,7 @@ process app_forumScripts {
         path 'app'
 
     """ 
-    git clone ${params.repogit} repo -b nextflow_pmid_identifiers_mapping_discovery
+    git clone ${params.repogit} repo -b nextflow
     mv repo/app .
     """
 }
@@ -22,7 +22,7 @@ process workflow_forumScripts {
         path 'workflow'
 
     """
-    git clone ${params.repogit} repo -b nextflow_pmid_identifiers_mapping_discovery
+    git clone ${params.repogit} repo -b nextflow
     mv repo/workflow .
     """
 }

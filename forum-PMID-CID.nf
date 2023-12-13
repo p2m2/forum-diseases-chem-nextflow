@@ -31,8 +31,8 @@ process config_import_PMIDCID {
     [DEFAULT]
     upload_file = upload_PMID_CID.sh
     log_file = log_PMID_CID.log
-    SOME_MAXIME = ${list_pmids_identifiers}
     [ELINK]
+    pubchem_ref_id_mapping = ${list_pmids_identifiers}
     version = ${params.forumRelease}
     run_as_test = ${params.entrez.run_as_test}
     pack_size = ${params.entrez.pack_size}
