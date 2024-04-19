@@ -1,7 +1,7 @@
 include { app_forumScripts } from './forum-source-repository'
 include { pubchemVersion ; waitPubChem } from './forum-PubChem-min'
 
-process get_pmid_identifiers_list {
+process get_pmid_identifiers_list_nodejs {
     memory '6 GB'
     conda 'nodejs'
     input:
@@ -13,6 +13,21 @@ process get_pmid_identifiers_list {
     npm install n3
     cp $app/build/pmid_to_identifier.js .
     node pmid_to_identifier.js PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz > list_pmids_identifiers.tsv
+    """
+}
+/* 2nd implementation to build correspondance identifier with old PMID. N3js have a bug and don't generate all corresponding id */
+process get_pmid_identifiers_list_rdf4j {
+    memory '6 GB'
+    conda 'curl openjdk'
+    input:
+        tuple val(pubchemVersion), path(app),path(pubChemReference)
+    
+    output:
+        path 'list_pmids_identifiers.tsv'
+    """
+    curl -L https://github.com/lihaoyi/ammonite/releases/download/3.0.0-M1/2.13-3.0.0-M1-bootstrap > amm && chmod +x amm 
+    cp $app/build/pmid_to_identifier_rdf4j.sc .
+    ./amm pmid_to_identifier_rdf4j.sc list_pmids_identifiers.tsv PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz
     """
 }
 
@@ -87,7 +102,7 @@ workflow forum_PMID_CID() {
     versionPubChem = pubchemVersion(pubChem)
     app = app_forumScripts()
 
-    list_pmidd_identifiers = get_pmid_identifiers_list(versionPubChem.combine(app).combine(reference))
+    list_pmidd_identifiers = get_pmid_identifiers_list_rdf4j(versionPubChem.combine(app).combine(reference))
 
     config_import_PMIDCID(versionPubChem,list_pmidd_identifiers)
         .combine(list_pmidd_identifiers)
