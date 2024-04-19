@@ -25,9 +25,9 @@ process get_pmid_identifiers_list_rdf4j {
     output:
         path 'list_pmids_identifiers.tsv'
     """
-    curl -L https://github.com/lihaoyi/ammonite/releases/download/3.0.0-M1/2.13-3.0.0-M1-bootstrap > amm && chmod +x amm 
+     sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/3.0.0-M1/2.13-3.0.0-M1) > amm && chmod +x amm'
     cp $app/build/pmid_to_identifier_rdf4j.sc .
-    ./amm pmid_to_identifier_rdf4j.sc list_pmids_identifiers.tsv PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz
+    ./amm pmid_to_identifier_rdf4j.sc list_pmids_identifiers.tsv PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl*
     """
 }
 
