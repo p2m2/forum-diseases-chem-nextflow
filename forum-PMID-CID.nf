@@ -6,14 +6,14 @@ process fix_unicode_error_rdf_pc_reference {
         tuple val(pubchemVersion), path(pubChemReference)
     output:
         path 'fix'
-    
+ 
+    /* check file with command : perl -ne 'print if /[^[:ascii:]]/' pc_reference_identifier*.ttl */   
     """
     mkdir fix
     for f in PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz; do
          STEM=fix_`basename \$f .gz`
-         gunzip -c \$f > \$STEM
          #fix unicode error when parsing ttl
-         sed 's/‑/-/g' \$STEM > fix/\$STEM
+         gunzip -c \$f | sed 's/‑/-/g' | sed 's/¬/-/g'| sed 's/–/-/g' > fix/\$STEM
     done
     """ 
 
