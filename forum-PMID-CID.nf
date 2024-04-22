@@ -2,16 +2,18 @@ include { app_forumScripts } from './forum-source-repository'
 include { pubchemVersion ; waitPubChem } from './forum-PubChem-min'
 
 process fix_unicode_error_rdf_pc_reference {
-     input:
+    input:
         tuple val(pubchemVersion), path(pubChemReference)
     output:
-        path "fix_*.ttl"
+        path 'fix'
+    
     """
+    mkdir fix
     for f in PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz; do
-         STEM=$(basename "${f}" .gz)
-         gunzip -c $f > $STEM
+         STEM=fix_`basename \$f .gz`
+         gunzip -c \$f > \$STEM
          #fix unicode error when parsing ttl
-         sed 's/‑/-/g' fix_$STEM
+         sed 's/‑/-/g' \$STEM > fix/\$STEM
     done
     """ 
 
@@ -36,14 +38,14 @@ process get_pmid_identifiers_list_rdf4j {
     memory '6 GB'
     conda 'curl openjdk'
     input:
-        tuple $ path(app),path(fix_file_pc_ref_ttl)
+        tuple path(app),path(fix_dir)
     
     output:
         path 'list_pmids_identifiers.tsv'
     """
-     sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/3.0.0-M1/2.13-3.0.0-M1) > amm && chmod +x amm'
+    sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/3.0.0-M1/2.13-3.0.0-M1) > amm && chmod +x amm'
     cp $app/build/pmid_to_identifier_rdf4j.sc .
-    ./amm pmid_to_identifier_rdf4j.sc list_pmids_identifiers.tsv $fix_file_pc_ref_ttl
+    ./amm pmid_to_identifier_rdf4j.sc list_pmids_identifiers.tsv $fix_dir/*.ttl
     """
 }
 
@@ -118,7 +120,7 @@ workflow forum_PMID_CID() {
     versionPubChem = pubchemVersion(pubChem)
     app = app_forumScripts()
     
-    fix_ttl_files = fix_unicode_error_rdf_pc_reference(pubChem.combine(reference))
+    fix_ttl_files = fix_unicode_error_rdf_pc_reference(versionPubChem.combine(reference))
 
     list_pmidd_identifiers = get_pmid_identifiers_list_rdf4j(app.combine(fix_ttl_files))
 
