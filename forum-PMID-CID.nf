@@ -1,6 +1,22 @@
 include { app_forumScripts } from './forum-source-repository'
 include { pubchemVersion ; waitPubChem } from './forum-PubChem-min'
 
+process fix_unicode_error_rdf_pc_reference {
+     input:
+        tuple val(pubchemVersion), path(pubChemReference)
+    output:
+        path "fix_*.ttl"
+    """
+    for f in PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz; do
+         STEM=$(basename "${f}" .gz)
+         gunzip -c $f > $STEM
+         #fix unicode error when parsing ttl
+         sed 's/‑/-/g' fix_$STEM
+    done
+    """ 
+
+}
+/*
 process get_pmid_identifiers_list_nodejs {
     memory '6 GB'
     conda 'nodejs'
@@ -14,20 +30,20 @@ process get_pmid_identifiers_list_nodejs {
     cp $app/build/pmid_to_identifier.js .
     node pmid_to_identifier.js PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl.gz > list_pmids_identifiers.tsv
     """
-}
+}*/
 /* 2nd implementation to build correspondance identifier with old PMID. N3js have a bug and don't generate all corresponding id */
 process get_pmid_identifiers_list_rdf4j {
     memory '6 GB'
     conda 'curl openjdk'
     input:
-        tuple val(pubchemVersion), path(app),path(pubChemReference)
+        tuple $ path(app),path(fix_file_pc_ref_ttl)
     
     output:
         path 'list_pmids_identifiers.tsv'
     """
      sh -c '(echo "#!/usr/bin/env sh" && curl -L https://github.com/com-lihaoyi/Ammonite/releases/download/3.0.0-M1/2.13-3.0.0-M1) > amm && chmod +x amm'
     cp $app/build/pmid_to_identifier_rdf4j.sc .
-    ./amm pmid_to_identifier_rdf4j.sc list_pmids_identifiers.tsv PubChem_Reference/reference/${pubchemVersion.trim()}/pc_reference_identifier*.ttl*
+    ./amm pmid_to_identifier_rdf4j.sc list_pmids_identifiers.tsv $fix_file_pc_ref_ttl
     """
 }
 
