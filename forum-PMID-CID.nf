@@ -117,8 +117,10 @@ workflow forum_PMID_CID() {
     pubChem = waitPubChem()
     versionPubChem = pubchemVersion(pubChem)
     app = app_forumScripts()
+    
+    fix_ttl_files = fix_unicode_error_rdf_pc_reference(pubChem.combine(reference))
 
-    list_pmidd_identifiers = get_pmid_identifiers_list_rdf4j(versionPubChem.combine(app).combine(reference))
+    list_pmidd_identifiers = get_pmid_identifiers_list_rdf4j(app.combine(fix_ttl_files))
 
     config_import_PMIDCID(versionPubChem,list_pmidd_identifiers)
         .combine(list_pmidd_identifiers)
