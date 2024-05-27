@@ -115,8 +115,13 @@ nextflow run forum.nf --rdfoutdir /scratch/$USER/forum-data
 
 ##### 27/09/2023 
 
-- 3d 17h 41m 56s	nextflow run forum-PMID-CID.nf -entry forum_PMID_CID              
+- 3d 17h 41m 56s nextflow run forum-PMID-CID.nf -entry forum_PMID_CID              
 - 14d 5h 58m 56s nextflow run forum-chemont.nf -entry forum_Chemont 
+
+##### 25/04/2024
+
+- 2d 17h 14m 4s  nextflow run forum-PMID-CID.nf -entry forum_PMID_CID
+
 
 #### TODO
 - tweak forum_Chemont
