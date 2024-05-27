@@ -1,7 +1,7 @@
 include { app_forumScripts } from './forum-source-repository'
 
 
-process download_Human1_1_7 {
+process download_Human {
     conda 'wget'
     maxRetries 3
 
@@ -9,34 +9,34 @@ process download_Human1_1_7 {
         path 'Human-GEM.xml'
 
     """
-    wget https://github.com/SysBioChalmers/Human-GEM/raw/main/model/Human-GEM.xml
+    wget https://raw.githubusercontent.com/SysBioChalmers/Human-GEM/${params.HumanGEMVersion}/model/Human-GEM.xml
     """
 } 
 
-process config_Human1_1_7 {
+process config_Human {
     publishDir params.configdir
 
     input:
-        path human1_1_7_sbml
+        path human_sbml
     
     output:
-        path 'config_Human1_1.7.ini'
+        path "config_Human_${params.HumanGEMVersion}.ini"
 
     """
-    tee -a config_Human1_1.7.ini << END
+    tee -a config_Human_${params.HumanGEMVersion}.ini << END
     [SBML]
-    path = ${human1_1_7_sbml}
-    version = Human1/1.7
+    path = ${human_sbml}
+    version = Human_${params.HumanGEMVersion}
     [DEFAULT]
-    upload_file = upload_Human1_1.7.sh
+    upload_file = upload_Human_${params.HumanGEMVersion}.sh
     [RDF]
-    path = GEM/HumanGEM/1.7/HumanGEM.ttl
+    path = GEM/HumanGEM/${params.HumanGEMVersion}/HumanGEM.ttl
     [META]
     path = app/build/data/table_info_2021.csv
     [VOID]
     description = Human-GEM: The generic genome-scale metabolic model of Homo sapiens
-    title = HumanGEM v1.7
-    source = https://github.com/SysBioChalmers/Human-GEM/tree/v1.7.0
+    title = HumanGEM ${params.HumanGEMVersion}
+    source = https://github.com/SysBioChalmers/Human-GEM/tree/${params.HumanGEMVersion}
     seeAlso = http:doi.org/10.1126/scisignal.aaz1482
     END
     """
@@ -52,18 +52,18 @@ process build_importSBML {
     publishDir params.rdfoutdir, pattern: "upload_Human1_1.7.sh"
     */
     input:
-        tuple path(config_Human1_1_7), path(app), path(human1_1_7_sbml)
+        tuple path(config_Human), path(app), path(human_sbml)
     output:
         path "GEM"
         path "Id_mapping/Intra/SBML"
-        path "upload_Human1_1.7.sh"
+        path "upload_Human_${params.HumanGEMVersion}.sh"
 
     """
-    python3 -u $app/build/import_SBML.py --config="$config_Human1_1_7" --out="." > import_SBML_Human.log
+    python3 -u $app/build/import_SBML.py --config="$config_Human" --out="." > import_SBML_Human.log
     """
 }
 
 workflow forum_SBML_Human() {
-    sbml = download_Human1_1_7()
-    config_Human1_1_7(sbml).combine(app_forumScripts()).combine(sbml) | build_importSBML 
+    sbml = download_Human()
+    config_Human(sbml).combine(app_forumScripts()).combine(sbml) | build_importSBML 
 }
