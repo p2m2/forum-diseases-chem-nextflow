@@ -12,7 +12,7 @@ process build_import_Chemont {
     input:
         val pubchemDescriptorExist
         path app 
-        path(pubChemDescriptorPath
+        path pubChemDescriptorPath
 
     output:
         path "ClassyFire"
@@ -30,7 +30,7 @@ process waitPubChem {
         val true
     
     """
-    echo "==== Waiting for $pubChemInchikeyDir ===="
+    echo "==== Waiting for $pubChemDescriptorDir ===="
     while [ ! -e ${pubChemDescriptorDir} ] ; do sleep 1; done
     """
 }
@@ -38,7 +38,6 @@ process waitPubChem {
 workflow forum_Chemont() {
     
     descriptor = Channel.fromPath("${params.rdfoutdir}/PubChem_Descriptor")
-
     build_import_Chemont(waitPubChem(descriptor), app_forumScripts(), descriptor)
     
 }
