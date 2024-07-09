@@ -19,7 +19,7 @@ process build_import_Chemont {
         path "upload_Chemont.sh"
     """
     curl -L https://github.com/lihaoyi/ammonite/releases/download/3.0.0-M2/2.13-3.0.0-M2-bootstrap > amm && chmod +x amm
-    amm buildChemontForum.sc . ${params.forumRelease} \$(find ${pubChemDescriptorPath} -name *canSMILES_value_*.ttl*)
+    ./amm app/build/forum-chemont-build/buildChemontForum.sc . ${params.forumRelease} \$(find ${pubChemDescriptorPath} -name *canSMILES_value_*.ttl*)
     """
 }
 
